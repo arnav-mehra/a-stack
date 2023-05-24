@@ -4,7 +4,7 @@ export default class MapperObject {
         this.func = func;
         
         const updater = this.fixChildCount.bind(this);
-        arrState.callbacks.push(updater);
+        this.arrState.callbacks.add(updater);
 
         this.wrapper = wrapper;
         this.wrapper.setChildren(this.getChildren());
@@ -15,18 +15,22 @@ export default class MapperObject {
     }
 
     addChild() {
-        this.wrapper.ref.appendChild(this.func(this.wrapper.children.length));
+        const wrapperRef = this.wrapper.ref;
+        wrapperRef.appendChild(
+            this.func(wrapperRef.children.length)
+        );
     }
 
     removeChild() {
-        this.wrapper.ref.removeChild(this.wrapper.lastChild);
+        const removalChild = this.wrapper.ref.lastChild;
+        removalChild.object.destroy();
     }
 
     fixChildCount() {
-        while (this.wrapper.children.length > this.arrState.value.length) {
+        while (this.wrapper.ref.children.length > this.arrState.value.length) {
             this.removeChild();
         }
-        while (this.wrapper.children.length < this.arrState.value.length) {
+        while (this.wrapper.ref.children.length < this.arrState.value.length) {
             this.addChild();
         }
     }

@@ -1,13 +1,13 @@
 export default class StateObject {
     constructor(initialValue) {
         this.value = initialValue;
-        this.callbacks = [];
+        this.callbacks = new Set();
     }
 
     setState(newValue) {
         this.value = typeof newValue === 'function'
                      ? newValue(this.value)
-                     : this.value = newValue;
+                     : newValue;
         this.callbacks.forEach(callback => callback());
     }
 }

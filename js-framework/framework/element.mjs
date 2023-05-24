@@ -3,6 +3,8 @@ import StateObject from "./state.mjs";
 export default class ElementObject {
     constructor(tag, props, children) {
         this.ref = document.createElement(tag);
+        this.ref.object = this;
+
         this.setProps(props);
         this.setChildren(children);
     }
@@ -18,7 +20,7 @@ export default class ElementObject {
                 continue;
             }
             if (val instanceof StateObject) {
-                val.callbacks.push(this.setProp.bind(this, key));
+                val.callbacks.add(this.setProp.bind(this, key));
             }
             this.setProp(key, val);
         }
@@ -28,5 +30,19 @@ export default class ElementObject {
         for (const child of children) {
             this.ref.appendChild(child.ref);
         }
+    }
+
+    // Unmounting
+
+    removeReactivity() {
+        for (const x of this.ref.childNodes) {
+            x.object.removeReactivity();
+        }
+    }
+
+    destroy() {
+        this.removeReactivity();
+        delete this.ref.object;
+        this.ref.remove();
     }
 }
