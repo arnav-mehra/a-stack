@@ -1,6 +1,5 @@
 export default class ComponentObject {
     constructor(parent, root) {
-        console.log({root})
         this.root = root;
         this.parent = parent || { ref: document.body };
     }

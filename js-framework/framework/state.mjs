@@ -8,6 +8,6 @@ export default class StateObject {
         this.value = typeof newValue === 'function'
                      ? newValue(this.value)
                      : newValue;
-        this.callbacks.forEach(callback => callback());
+        this.callbacks.forEach(cb => cb());
     }
 }

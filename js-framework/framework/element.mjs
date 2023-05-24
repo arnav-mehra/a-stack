@@ -1,3 +1,4 @@
+import ReactiveObject from "./reactive.mjs";
 import StateObject from "./state.mjs";
 
 export default class ElementObject {
@@ -15,12 +16,14 @@ export default class ElementObject {
 
     setProps(props) {
         for (const [ key, val ] of Object.entries(props)) {
+            // TO-DO: Add support for more events
             if (key === 'onclick') {
                 this.ref.addEventListener('click', val);
                 continue;
             }
-            if (val instanceof StateObject) {
-                val.callbacks.add(this.setProp.bind(this, key));
+            if (val instanceof ReactiveObject) {
+                val.activate(this.setProp.bind(this, key));
+                continue;
             }
             this.setProp(key, val);
         }

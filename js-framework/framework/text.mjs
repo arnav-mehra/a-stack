@@ -1,37 +1,32 @@
+import ReactiveObject from "./reactive.mjs";
+
 export default class TextObject {
-    constructor(func, deps) {
-        if (typeof func !== 'function') {
-            this.ref = document.createTextNode(func);
+    constructor(input) {
+        if (input instanceof ReactiveObject) {
+            this.ref = document.createTextNode('');
             this.ref.object = this;
+            this.addReactivity(input);
             return;
         }
-        
-        this.ref = document.createTextNode('');
+        // input is a constant displayable value
+        this.ref = document.createTextNode(input);
         this.ref.object = this;
-        
-        this.deps = deps;
-        this.func = func;
-        this.updateText();
-        
-        this.addReactivity();
     }
-
-    addReactivity() {
-        this.updater = this.updateText.bind(this);
-        this.deps.forEach(x => x.callbacks.add(this.updater));
-    }
-
-    updateText() {
-        const newText = this.func(...this.deps.map(x => x.value));
+    
+    updateText(newText) {
         this.ref.nodeValue = newText;
+    }
+
+    addReactivity(reactive) {
+        this.reactive = reactive;
+        this.reactive.activate(this.updateText.bind(this));
     }
     
     removeReactivity() {
         for (const x of this.ref.childNodes) {
             x.object.removeReactivity();
         }
-        this.deps.forEach(x => x.callbacks.delete(this.updater));
-        this.updater = undefined;
+        this.reactive?.deactivate();
     }
 
     destroy() {

@@ -16,9 +16,8 @@ export default class MapperObject {
 
     addChild() {
         const wrapperRef = this.wrapper.ref;
-        wrapperRef.appendChild(
-            this.func(wrapperRef.children.length)
-        );
+        const newElement = this.func(wrapperRef.children.length);
+        wrapperRef.appendChild(newElement.ref);
     }
 
     removeChild() {
@@ -27,10 +26,11 @@ export default class MapperObject {
     }
 
     fixChildCount() {
-        while (this.wrapper.ref.children.length > this.arrState.value.length) {
+        const correctLength = this.arrState.value.length;
+        while (this.wrapper.ref.children.length > correctLength) {
             this.removeChild();
         }
-        while (this.wrapper.ref.children.length < this.arrState.value.length) {
+        while (this.wrapper.ref.children.length < correctLength) {
             this.addChild();
         }
     }

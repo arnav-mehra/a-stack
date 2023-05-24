@@ -1,5 +1,6 @@
-import { Component, Element, Text, State, Mapper } from "./framework/main.mjs";
+import { Component, Element, Text, State, Mapper, Reactive } from "./framework/main.mjs";
 
+const color = State('red');
 const count = State(0);
 const items = State([
     { name: 'Item 1', price: 1.99 },
@@ -12,14 +13,16 @@ Component(
     null,
     Element('div', { id: 'container' }, [
         Mapper(
-            Element('div', {}, []),
+            Element('div', {}, []), // wrapper/container
             items, (i) => (
-                Element('div', {}, [
+                Element('div', {
+                    style: Reactive((c) => `color: ${c};`, [ color ])
+                }, [
                     Element('p', {}, [
-                        Text(x => x[i].name, [ items ])
+                        Text(Reactive(x => x[i].name, [ items ]))
                     ]),
                     Element('p', {}, [
-                        Text(x => x[i].price, [ items ])
+                        Text(Reactive(x => x[i].price, [ items ]))
                     ])
                 ])
             )
@@ -29,10 +32,18 @@ Component(
         // ]),
         Element('button', {
             onclick: () => {
+                // items.setState(prev => {
+                //     console.log({prev})
+                //     prev[0].name = 'x';
+                //     return prev;
+                // })
                 items.setState(prev => {
-                    prev.pop();
+                    prev.push({ name: 'x', price: 5.99 });
+                    console.log({prev})
                     return prev;
                 })
+                // color.setState(prev => prev === 'red' ? 'blue' : 'red');
+                // console.log({color})
             },
         }, [
             Text('Click Me!')
