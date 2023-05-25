@@ -1,11 +1,8 @@
-import ReactiveObject from "./reactive.mjs";
-import StateObject from "./state.mjs";
+import ReactiveObject from "../reactivity/reactive.mjs";
 
 export default class ElementObject {
     constructor(tag, props, children) {
         this.ref = document.createElement(tag);
-        this.ref.object = this;
-
         this.setProps(props);
         this.setChildren(children);
     }
@@ -17,6 +14,7 @@ export default class ElementObject {
     setProps(props) {
         for (const [ key, val ] of Object.entries(props)) {
             // TO-DO: Add support for more events
+            // TO-DO: Add support for reactive event listeners
             if (key === 'onclick') {
                 this.ref.addEventListener('click', val);
                 continue;
@@ -33,19 +31,5 @@ export default class ElementObject {
         for (const child of children) {
             this.ref.appendChild(child.ref);
         }
-    }
-
-    // Unmounting
-
-    removeReactivity() {
-        for (const x of this.ref.childNodes) {
-            x.object.removeReactivity();
-        }
-    }
-
-    destroy() {
-        this.removeReactivity();
-        delete this.ref.object;
-        this.ref.remove();
     }
 }

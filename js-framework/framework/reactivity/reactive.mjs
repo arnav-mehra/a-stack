@@ -1,23 +1,21 @@
 export default class ReactiveObject {
-    constructor(func, deps) {
+    constructor(component, func, deps) {
+        component.reactives.push(this);
         this.deps = deps;
         this.func = func;
     }
 
-    getValue() {
-        return this.func(...this.deps.map(x => x.value));
+    updateValue(updater) {
+        const newValue = this.func(...this.deps.map(x => x.value));
+        updater(newValue);
     }
 
     // updater: updates displayed value
     // this.updater: runs reactive reducer func & runs updater
     activate(updater) {
-        this.updater = this.setValue.bind(this, updater);
+        this.updater = this.updateValue.bind(this, updater);
         this.updater();
         this.deps.forEach(x => x.callbacks.add(this.updater));
-    }
-
-    setValue(updater) {
-        updater(this.getValue());
     }
 
     deactivate() {

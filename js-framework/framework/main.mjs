@@ -1,35 +1,73 @@
-import ElementObject from './element.mjs';
-import ComponentObject from './component.mjs';
-import TextObject from './text.mjs';
-import StateObject from './state.mjs';
-import MapperObject from './mapper.mjs';
-import ReactiveObject from './reactive.mjs';
+import ElementObject from './nodes/element.mjs';
+import TextObject from './nodes/text.mjs';
 
-export function Component(parent, root) {
-    return new ComponentObject(parent, root);
+import ComponentObject from './schemes/component.mjs';
+import ConditionalObject from './schemes/conditional.mjs';
+import MapperObject from './schemes/mapper.mjs';
+
+import StateObject from './reactivity/state.mjs';
+import ReactiveObject from './reactivity/reactive.mjs';
+
+export function MicroComponent(
+    wrapper = { ref: document.body },
+    render = () => Element()
+) {
+    return new MicroComponentObject(wrapper, render, onMount, onUnmount, reactives);
+}
+
+export function Component(
+    wrapper = { ref: document.body },
+    render = () => Element(),
+    onMount = () => {},
+    onUnmount = () => {},
+    reactives = []
+) {
+    return new ComponentObject(wrapper, render, onMount, onUnmount, reactives);
 }
 
 export function Element(
-    tag, /* html tag */
-    props /* { key: [value or Reactive] } */,
-    children /* list child ElementObjects */
+    tag = 'div', // html tag
+    props = {}, // { key: [value or Reactive] }
+    children = [] // list child ElementObjects
 ) {
     return new ElementObject(tag, props, children);
 }
 
-export function Text(input) { // either a displayable value or reactive
+export function Text(
+    input = '' // either a displayable value or reactive
+) {
     return new TextObject(input);
 }
 
-export function Mapper(wrapper, arrState, func) {
+export function Mapper(
+    wrapper = Element(), // parent/root of mapped elements
+    arrState = State([]), // array state to map
+    func = () => Element() // function to map each item to an element
+) {
     const mapperObj = new MapperObject(wrapper, arrState, func);
     return wrapper;
 }
 
-export function Reactive(func, deps) {
-    return new ReactiveObject(func, deps);
+export function Conditional(
+    wrapper = Element(),
+    reactive = Reactive(),
+    trueElement = Element(),
+    falseElement = Element()
+) {
+    const condObj = new ConditionalObject(wrapper, reactive, trueElement, falseElement)
+    return wrapper;
 }
 
-export function State(initialValue) {
+export function Reactive(
+    component = null,
+    func = () => {},
+    deps = []
+) {
+    return new ReactiveObject(component, func, deps);
+}
+
+export function State(
+    initialValue = null
+) {
     return new StateObject(initialValue);
 }

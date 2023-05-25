@@ -2,16 +2,21 @@ export default class MapperObject {
     constructor(wrapper, arrState, func) {
         this.arrState = arrState;
         this.func = func;
+        this.addReactivity();
         
-        const updater = this.fixChildCount.bind(this);
-        this.arrState.callbacks.add(updater);
-
         this.wrapper = wrapper;
         this.wrapper.setChildren(this.getChildren());
     }
 
     getChildren() {
-        return this.arrState.value.map((_, i) => this.func(i))
+        return this.arrState.value.map(
+            (_, i) => this.func(i)
+        )
+    }
+
+    addReactivity() {
+        const updater = this.fixChildCount.bind(this);
+        this.arrState.callbacks.add(updater);
     }
 
     addChild() {
@@ -21,8 +26,7 @@ export default class MapperObject {
     }
 
     removeChild() {
-        const removalChild = this.wrapper.ref.lastChild;
-        removalChild.object.destroy();
+        this.wrapper.ref.lastChild.remove();
     }
 
     fixChildCount() {
