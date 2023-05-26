@@ -1,6 +1,5 @@
 export default class ReactiveObject {
-    constructor(component, func, deps) {
-        component.reactives.push(this);
+    constructor(func, deps) {
         this.deps = deps;
         this.func = func;
     }

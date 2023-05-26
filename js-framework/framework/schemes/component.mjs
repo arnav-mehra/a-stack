@@ -1,33 +1,74 @@
-export default class ComponentObject {
-    constructor(wrapper, render,
-                onMount, onUnmount, reactives) {
-        this.wrapper = wrapper;
-        this.root = null;
-        
-        this.render = render;
-        this.onMount = onMount;
-        this.onUnmount = onUnmount;
-        this.reactives = reactives;
+import { Element } from '../main.mjs';
+import EffectObject from '../reactivity/effect.mjs';
+import ReactiveObject from '../reactivity/reactive.mjs';
+import StateObject from '../reactivity/state.mjs';
+
+// _variableName: means the method should not be used by the user.
+
+export default class Component {
+    constructor() {
+        this._wrapper = Element();
+        // this._states = [];
+        this._reactives = [];
+        this._effects = [];
+        this._children = [];
     }
 
-    mount() {
-        if (this.root) return;
-
-        this.onMount();
-
-        this.root = this.render(this);
-        this.wrapper.ref.appendChild(this.root.ref);
+    State(initialValue) {
+        const state = new StateObject(initialValue);
+        // this._states.push(state);
+        return state;
     }
     
-    unmount() {
-        if (!this.root) return;
+    Effect(func = () => {}, deps = []) {
+        const boundFunc = func.bind(this);
+        const effect = new EffectObject(boundFunc, deps);
+        this._effects.push(effect);
+        return effect;
+    }
 
-        this.onUnmount();
-        
-        this.reactives.forEach(r => r.deactivate());
-        this.reactives = [];
+    Reactive(func = () => {}, deps = []) {
+        const reactive = new ReactiveObject(func, deps);
+        this._reactives.push(reactive);
+        return reactive;
+    }
 
-        this.root.ref.remove();
-        this.root = null;
+    Component(ComponentClass, ...props) {
+        const wrapper = Element();
+        const component = new ComponentClass(props);
+        component._wrapper = wrapper;
+        this._children.push(component);
+        return wrapper;
+    }
+
+    _mount() {
+        if (this._root) return;
+        // 1. create this component's DOM tree.
+        this._root = this.render();
+        // 2. do steps 1-3 for all children.
+        this._children.forEach(c => c._mount());
+        // 3. mount the node.
+        this._wrapper.ref.appendChild(this._root.ref);
+        if (this.onMount) this.onMount();
+    }
+
+    _recursiveCleanup() {
+        // 1. cleanup chlidren.
+        this._children.forEach(c => c.recursiveCleanup());
+        this._children = [];
+        // 2. cleanup self.
+        if (this.onUnmount) this.onUnmount();
+        // this._states = [];
+        this._reactives.forEach(r => r.deactivate());
+        this._reactives = [];
+        this._effects.forEach(e => e.deactivate());
+        this._effects = [];
+    }
+
+    _unmount() {
+        if (!this._root) return;
+        this._recursiveCleanup();
+        this._root.ref.remove();
+        this._root = undefined;
     }
 }

@@ -1,29 +1,11 @@
+export { default as Component } from './schemes/component.mjs';
+
+import { Component } from './main.mjs';
 import ElementObject from './nodes/element.mjs';
 import TextObject from './nodes/text.mjs';
 
-import ComponentObject from './schemes/component.mjs';
 import ConditionalObject from './schemes/conditional.mjs';
 import MapperObject from './schemes/mapper.mjs';
-
-import StateObject from './reactivity/state.mjs';
-import ReactiveObject from './reactivity/reactive.mjs';
-
-export function MicroComponent(
-    wrapper = { ref: document.body },
-    render = () => Element()
-) {
-    return new MicroComponentObject(wrapper, render, onMount, onUnmount, reactives);
-}
-
-export function Component(
-    wrapper = { ref: document.body },
-    render = () => Element(),
-    onMount = () => {},
-    onUnmount = () => {},
-    reactives = []
-) {
-    return new ComponentObject(wrapper, render, onMount, onUnmount, reactives);
-}
 
 export function Element(
     tag = 'div', // html tag
@@ -50,24 +32,10 @@ export function Mapper(
 
 export function Conditional(
     wrapper = Element(),
-    reactive = Reactive(),
-    trueElement = Element(),
-    falseElement = Element()
+    reactive,
+    trueFunc = () => Element(),
+    falseFunc = () => Element()
 ) {
-    const condObj = new ConditionalObject(wrapper, reactive, trueElement, falseElement)
+    const condObj = new ConditionalObject(wrapper, reactive, trueFunc, falseFunc)
     return wrapper;
-}
-
-export function Reactive(
-    component = null,
-    func = () => {},
-    deps = []
-) {
-    return new ReactiveObject(component, func, deps);
-}
-
-export function State(
-    initialValue = null
-) {
-    return new StateObject(initialValue);
 }

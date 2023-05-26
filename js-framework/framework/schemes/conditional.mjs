@@ -3,8 +3,15 @@ import { Component } from "../main.mjs";
 export default class ConditionalObject {
     constructor(wrapper, reactive, trueFunc, falseFunc) {
         this.wrapper = wrapper;
-        this.trueComponent = Component(this.wrapper, trueFunc);
-        this.falseComponent = Component(this.wrapper, falseFunc);
+
+        this.trueComponent = new Component();
+        this.trueComponent._wrapper = this.wrapper;
+        this.trueComponent.render = trueFunc;
+
+        this.falseComponent = new Component();
+        this.falseComponent._wrapper = this.wrapper;
+        this.falseComponent.render = falseFunc;
+
         this.addReactivity(reactive);
     }
 
@@ -15,16 +22,16 @@ export default class ConditionalObject {
     updateBranch(newVal) {
         if (this.oldVal === undefined) { // initial render
             const mountingComponent = newVal ? this.trueComponent : this.falseComponent;
-            mountingComponent.mount();
+            mountingComponent._mount();
         }
         else if (newVal === this.oldVal) { // no change
             return;
         }
         else { // value changed
             const unmountingComponent = this.oldVal ? this.trueComponent : this.falseComponent;
-            unmountingComponent.unmount();
+            unmountingComponent._unmount();
             const mountingComponent = newVal ? this.trueComponent : this.falseComponent;
-            mountingComponent.mount();
+            mountingComponent._mount();
         }
         this.oldVal = newVal;
     }
