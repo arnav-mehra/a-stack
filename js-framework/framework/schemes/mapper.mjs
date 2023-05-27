@@ -1,41 +1,42 @@
-export default class MapperObject {
-    constructor(wrapper, arrState, func) {
-        this.arrState = arrState;
-        this.func = func;
-        this.addReactivity();
-        
-        this.wrapper = wrapper;
-        this.wrapper.setChildren(this.getChildren());
+import Component from "./component.mjs";
+
+export default class MapperComponent extends Component {
+    constructor(reactive, mapperFunc) {
+        super();
+        this.mapperFunc = mapperFunc;
+        this.addReactivity(reactive);
     }
 
-    getChildren() {
-        return this.arrState.value.map(
-            (_, i) => this.func(i)
-        )
-    }
-
-    addReactivity() {
+    addReactivity(reactive) {
         const updater = this.fixChildCount.bind(this);
-        this.arrState.callbacks.add(updater);
+        reactive.activate(updater);
     }
 
-    addChild() {
-        const wrapperRef = this.wrapper.ref;
-        const newElement = this.func(wrapperRef.children.length);
-        wrapperRef.appendChild(newElement.ref);
-    }
-
-    removeChild() {
-        this.wrapper.ref.lastChild.remove();
-    }
-
-    fixChildCount() {
-        const correctLength = this.arrState.value.length;
-        while (this.wrapper.ref.children.length > correctLength) {
+    fixChildCount(newArr) {
+        const correctLength = newArr.length;
+        while (this._children.length > correctLength) {
             this.removeChild();
         }
-        while (this.wrapper.ref.children.length < correctLength) {
+        while (this._children.length < correctLength) {
             this.addChild();
         }
     }
+    
+    removeChild() {
+        const removalChild = this._children.pop();
+        removalChild._unmount();
+    }
+
+    addChild() {
+        const child = this.createChild(this._children.length);
+        child._mount();
+    }
+
+    createChild(i) {
+        const child = this._Component(Component);
+        child.render = this.mapperFunc.bind(child, i);
+        return child;
+    }
+
+    _mount() {} // give full control of mounting to reactivity.
 }

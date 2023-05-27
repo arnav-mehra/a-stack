@@ -1,17 +1,10 @@
-import { Component } from "../main.mjs";
+import Component from "./component.mjs";
 
-export default class ConditionalObject {
-    constructor(wrapper, reactive, trueFunc, falseFunc) {
-        this.wrapper = wrapper;
-
-        this.trueComponent = new Component();
-        this.trueComponent._wrapper = this.wrapper;
-        this.trueComponent.render = trueFunc;
-
-        this.falseComponent = new Component();
-        this.falseComponent._wrapper = this.wrapper;
-        this.falseComponent.render = falseFunc;
-
+export default class ConditionalComponent extends Component {
+    constructor(reactive, trueFunc) {
+        super();
+        const child = this._Component(Component);
+        child.render = trueFunc.bind(child);
         this.addReactivity(reactive);
     }
 
@@ -19,20 +12,13 @@ export default class ConditionalObject {
         reactive.activate(this.updateBranch.bind(this));
     }
 
-    updateBranch(newVal) {
-        if (this.oldVal === undefined) { // initial render
-            const mountingComponent = newVal ? this.trueComponent : this.falseComponent;
-            mountingComponent._mount();
+    updateBranch(val) {
+        if (val) {
+            this._children[0]._mount();
+        } else {
+            this._children[0]._unmount();
         }
-        else if (newVal === this.oldVal) { // no change
-            return;
-        }
-        else { // value changed
-            const unmountingComponent = this.oldVal ? this.trueComponent : this.falseComponent;
-            unmountingComponent._unmount();
-            const mountingComponent = newVal ? this.trueComponent : this.falseComponent;
-            mountingComponent._mount();
-        }
-        this.oldVal = newVal;
     }
+
+    _mount() {} // give full control of mounting to reactivity.
 }

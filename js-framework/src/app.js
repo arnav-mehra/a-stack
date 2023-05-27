@@ -1,69 +1,74 @@
 import {
     Component,
-    Element, Text,
-    Mapper, Conditional
+    Element,
+    Text
 } from "../framework/main.mjs";
+
+import ConditionalComponent from "../framework/schemes/conditional.mjs";
+import MapperComponent from "../framework/schemes/mapper.mjs";
+
+let props = {};
+let states = {};
 
 export default class App extends Component {
     constructor(props) {
         super();
         console.log({props})
 
-        this.count = this.State(0);
+        states.count = this.State(0);
+        states.items = this.State([
+            { name: 'Item 1', price: 1.99 },
+            { name: 'Item 2', price: 2.99 },
+            { name: 'Item 3', price: 3.99 },
+            { name: 'Item 4', price: 4.99 }
+        ]);
+        states.color = this.State('red');
 
         this.Effect(() => {
-            console.log(this.count.value)
-        }, [ this.count ]);
+            console.log(states.count.value)
+        }, [ states.count ]);
     }
 
-    onMount() { console.log('mounted'); }
-    onUnmount() { console.log('unmounted'); }
+    onMount() {}
+
+    onUnmount() {
+        states = {};
+    }
 
     render() {
-        return Element('div', {}, [   
-            Text(this.Reactive(c => c, [ this.count ])),
+        return Element('span', {}, [   
             Element('button', {
                 style: "display: block; margin-top: 10px;",
                 onclick: () => {
-                    this.count.setState(prev => prev + 1);
+                    // states.count.setState(prev => prev + 1);
+                    states.items.setState(prev => {
+                        prev.pop();
+                        return prev;
+                    });
+                    // color.setState(prev => prev === 'red' ? 'blue' : 'red');
                 },
             }, [
                 Text('Click Me!')
             ]),
+            
+            // this.Component(
+            //     ConditionalComponent,
+            //     this.Reactive(c => c % 2, [ states.count ]),
+            //     function() {
+            //         return Element('p', {}, [ Text('Odd') ]);
+            //     }
+            // ),
+
+            this.Component(
+                MapperComponent,
+                this.Reactive(x => x, [ states.items ]),
+                function(i) {
+                    return Element('p', {}, [
+                        Text(this.Reactive(x => x[i].name, [ states.items ]))
+                    ])
+                }
+            )
         ]);
     }
 };
 
-// this.color = this.State('red');
-// this.items = this.State([
-//     { name: 'Item 1', price: 1.99 },
-//     { name: 'Item 2', price: 2.99 },
-//     { name: 'Item 3', price: 3.99 },
-//     { name: 'Item 4', price: 4.99 }
-// ]);
-
-// color.setState(prev => prev === 'red' ? 'blue' : 'red');
-// items.setState(prev => { prev[0].name = 'x'; return prev; })
-
-// Conditional(
-//     Element(),
-//     this.Reactive(c => c % 2, [ this.count ]),
-//     () => Element('p', {}, [ Text('Even') ]),
-//     () => Element('p', {}, [ Text('Odd') ])
-// ),
-
-// Mapper(
-//     Element(), // wrapper/container
-//     items, (component, i) => (
-//         Element('div', {
-//             style: Reactive(component, c => `color: ${c};`, [ color ])
-//         }, [
-//             Element('p', {}, [
-//                 Text(Reactive(component, x => x[i].name, [ items ]))
-//             ]),
-//             Element('p', {}, [
-//                 Text(Reactive(component, x => x[i].price, [ items ]))
-//             ])
-//         ])
-//     )
-// ),

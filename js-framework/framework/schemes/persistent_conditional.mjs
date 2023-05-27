@@ -4,10 +4,10 @@
 // Better to use when branches are large and the condition is frequently changing.
 
 export default class PersistentConditionalObject {
-    constructor(wrapper, reactive, trueElement, falseElement) {
-        this.wrapper = wrapper;
-        this.trueElement = trueElement;
-        this.falseElement = falseElement;
+    constructor(reactive, trueFunc) {
+        super();
+        const child = this._Component(Component);
+        child.render = trueFunc.bind(child);
         this.addReactivity(reactive);
     }
 
@@ -16,18 +16,11 @@ export default class PersistentConditionalObject {
     }
 
     updateBranch(val) {
-        const wrapperRef = this.wrapper.ref;
-        const newNode = val ? this.trueElement : this.falseElement;
-
-        if (!this.oldNode) { // null -> new node
-            wrapperRef.appendChild(newNode.ref);
-        }
-        else if (newNode === this.oldNode) { // old node -> same old node
-            return;
-        }
-        else { // old node -> new node
-            wrapperRef.replaceChild(newNode.ref, this.oldNode.ref);
-        }
-        this.oldNode = newNode;
+        this._wrapper.ref.setChildren(
+            val ? [ this._children[0]._wrapper.ref ] : []
+        );
     }
+
+    _mount() {} // give full control of mounting to reactivity.
+
 }

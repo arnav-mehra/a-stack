@@ -27,18 +27,22 @@ export default class Component {
         return effect;
     }
 
-    Reactive(func = () => {}, deps = []) {
+    Reactive(func, deps) {
         const reactive = new ReactiveObject(func, deps);
         this._reactives.push(reactive);
         return reactive;
     }
 
     Component(ComponentClass, ...props) {
-        const wrapper = Element();
-        const component = new ComponentClass(props);
-        component._wrapper = wrapper;
-        this._children.push(component);
-        return wrapper;
+        const child = this._Component(ComponentClass, ...props);
+        return child._wrapper;
+    }
+
+    _Component(ComponentClass, ...props) {
+        const child = new ComponentClass(...props);
+        this._children.push(child);
+        this._wrapper.ref.appendChild(child._wrapper.ref);
+        return child;
     }
 
     _mount() {
@@ -48,13 +52,13 @@ export default class Component {
         // 2. do steps 1-3 for all children.
         this._children.forEach(c => c._mount());
         // 3. mount the node.
-        this._wrapper.ref.appendChild(this._root.ref);
+        if (this._root) this._wrapper.ref.appendChild(this._root.ref);
         if (this.onMount) this.onMount();
     }
 
     _recursiveCleanup() {
         // 1. cleanup chlidren.
-        this._children.forEach(c => c.recursiveCleanup());
+        this._children.forEach(c => c._recursiveCleanup());
         this._children = [];
         // 2. cleanup self.
         if (this.onUnmount) this.onUnmount();

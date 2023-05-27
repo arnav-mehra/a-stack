@@ -14,7 +14,7 @@ class Root extends Component {
     }
 
     render() {
-        return this.Component(App)
+        return this.Component(App);
     }
 }
 
