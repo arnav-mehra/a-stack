@@ -8,11 +8,14 @@ import StateObject from '../reactivity/state.mjs';
 // _variableName: means the method should not be used by the user.
 
 export default class Component {
-    constructor(wrapper, props) {
+    constructor(
+        wrapper = this.Element(), // component wrapper (components aren't fragments)
+        props
+    ) {
         this.props = props;
         this.state = {};
 
-        this._wrapper = wrapper || this.Element();
+        this._wrapper = wrapper;
         // this._states = [];
         this._reactives = [];
         this._effects = [];
@@ -54,7 +57,7 @@ export default class Component {
     }
 
     Component(ComponentClass, wrapper, ...props) {
-        const child = this._Component(ComponentClass, wrapper, ...props);
+        const child = this._Component(ComponentClass, wrapper,...props);
         return child._wrapper;
     }
 

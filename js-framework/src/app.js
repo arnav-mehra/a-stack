@@ -17,7 +17,9 @@ export default class App extends Component {
 
         this.Effect(() => {
             console.log('upd val: ', this.state.count.value)
-        }, [ this.state.count ]);
+        }, [
+            this.Reactive(c => c, [ this.state.count ])
+        ]);
     }
 
     onMount() {
