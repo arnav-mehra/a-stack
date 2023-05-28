@@ -1,7 +1,11 @@
 import ReactiveObject from "../reactivity/reactive.mjs";
 
 export default class ElementObject {
-    constructor(tag, props, children) {
+    constructor(
+        tag = 'div',
+        props = {}, // { key: [value || ReactiveObject] }
+        children = [] // ElementObject[]
+    ) {
         this.ref = document.createElement(tag);
         this.setProps(props);
         this.setChildren(children);

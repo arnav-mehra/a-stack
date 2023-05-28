@@ -1,4 +1,6 @@
-import { Element } from '../main.mjs';
+import ElementObject from '../nodes/element.mjs';
+import TextObject from '../nodes/text.mjs';
+
 import EffectObject from '../reactivity/effect.mjs';
 import ReactiveObject from '../reactivity/reactive.mjs';
 import StateObject from '../reactivity/state.mjs';
@@ -6,18 +8,28 @@ import StateObject from '../reactivity/state.mjs';
 // _variableName: means the method should not be used by the user.
 
 export default class Component {
-    constructor() {
-        this._wrapper = Element();
+    constructor(wrapper, props) {
+        this.props = props;
+        this.state = {};
+
+        this._wrapper = wrapper || this.Element();
         // this._states = [];
         this._reactives = [];
         this._effects = [];
         this._children = [];
     }
 
-    State(initialValue) {
-        const state = new StateObject(initialValue);
-        // this._states.push(state);
-        return state;
+    // USER METHODS
+
+    State(stateKeyVals) {
+        for (const [ key, initVal ] of Object.entries(stateKeyVals)) {
+            if (this.state[key]) {
+                console.error(`State key ${key} already exists.`);
+                continue;
+            }
+            const state = new StateObject(initVal);
+            this.state[key] = state;
+        }
     }
     
     Effect(func = () => {}, deps = []) {
@@ -33,13 +45,23 @@ export default class Component {
         return reactive;
     }
 
-    Component(ComponentClass, ...props) {
-        const child = this._Component(ComponentClass, ...props);
+    Text(input) {
+        return new TextObject(input);
+    }
+
+    Element(tag, props, children) {
+        return new ElementObject(tag, props, children);
+    }
+
+    Component(ComponentClass, wrapper, ...props) {
+        const child = this._Component(ComponentClass, wrapper, ...props);
         return child._wrapper;
     }
 
-    _Component(ComponentClass, ...props) {
-        const child = new ComponentClass(...props);
+    // INTERNAL METHODS
+
+    _Component(ComponentClass, wrapper, ...props) {
+        const child = new ComponentClass(wrapper, ...props);
         this._children.push(child);
         this._wrapper.ref.appendChild(child._wrapper.ref);
         return child;
@@ -62,7 +84,6 @@ export default class Component {
         this._children = [];
         // 2. cleanup self.
         if (this.onUnmount) this.onUnmount();
-        // this._states = [];
         this._reactives.forEach(r => r.deactivate());
         this._reactives = [];
         this._effects.forEach(e => e.deactivate());

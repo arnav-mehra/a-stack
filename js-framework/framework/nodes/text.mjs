@@ -1,7 +1,9 @@
 import ReactiveObject from "../reactivity/reactive.mjs";
 
 export default class TextObject {
-    constructor(input) {
+    constructor(
+        input = '' // value || ReactiveObject'
+    ) {
         if (input instanceof ReactiveObject) {
             this.ref = document.createTextNode('');
             this.addReactivity(input);

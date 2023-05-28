@@ -4,10 +4,13 @@
 // Better to use when branches are large and the condition is frequently changing.
 
 export default class PersistentConditionalObject {
-    constructor(reactive, trueFunc) {
+    constructor(parent, reactive, trueFunc) {
         super();
-        const child = this._Component(Component);
+        
+        const child = this._Component(Component, parent.props);
         child.render = trueFunc.bind(child);
+        child.state = parent.state;
+
         this.addReactivity(reactive);
     }
 

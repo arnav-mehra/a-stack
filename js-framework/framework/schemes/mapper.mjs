@@ -1,8 +1,10 @@
 import Component from "./component.mjs";
 
 export default class MapperComponent extends Component {
-    constructor(reactive, mapperFunc) {
-        super();
+    constructor(wrapper, parent, reactive, mapperFunc) {
+        super(wrapper, parent.props);
+        this.state = parent.state;
+
         this.mapperFunc = mapperFunc;
         this.addReactivity(reactive);
     }
@@ -33,7 +35,8 @@ export default class MapperComponent extends Component {
     }
 
     createChild(i) {
-        const child = this._Component(Component);
+        const child = this._Component(Component, this.props);
+        child.state = this.state;
         child.render = this.mapperFunc.bind(child, i);
         return child;
     }

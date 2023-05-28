@@ -1,18 +1,13 @@
 export { default as Component } from './schemes/component.mjs';
+import { Component } from './main.mjs';
 
-import ElementObject from './nodes/element.mjs';
-import TextObject from './nodes/text.mjs';
+import ConditionalComponent from './schemes/conditional.mjs';
+import MapperComponent from './schemes/mapper.mjs';
 
-export function Element(
-    tag = 'div', // html tag
-    props = {}, // { key: [value || Reactive] }
-    children = [] // list child ElementObjects
-) {
-    return new ElementObject(tag, props, children);
+Component.prototype.Mapper = function(wrapper, reactive, mapperFunc) {
+    return this.Component(MapperComponent, wrapper, this, reactive, mapperFunc);
 }
 
-export function Text(
-    input = '' /* value || reactive */
-) {
-    return new TextObject(input);
+Component.prototype.Conditional = function(wrapper, reactive, trueFunc) {
+    return this.Component(ConditionalComponent, wrapper, this, reactive, trueFunc);
 }
