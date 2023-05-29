@@ -15,11 +15,9 @@ export default class App extends Component {
             color: 'red'
         });
 
-        this.Effect(() => {
-            console.log('upd val: ', this.state.count.value)
-        }, [
-            this.Reactive(c => c, [ this.state.count ])
-        ]);
+        this.Reactive(() => {
+            console.log('count:', this.state.count.value);
+        }, [ this.state.count ]);
     }
 
     onMount() {
@@ -33,9 +31,9 @@ export default class App extends Component {
     render() {
         return this.Element('span', {}, [   
             this.Element('button', {
-                style: this.Reactive(
-                    c => `color: ${c};`, [ this.state.color ]
-                ),
+                // style: this.Reactive(
+                //     c => `color: ${c};`, [ this.state.color ]
+                // ),
                 onclick: () => {
                     this.state.count.setState(prev => prev + 1);
                     // this.state.items.setState(prev => {
@@ -55,23 +53,23 @@ export default class App extends Component {
                     return this.Text('Odd');
                 }
             ),
-            this.Conditional(
-                this.Element(),
-                this.Reactive(c => !(c % 2), [ this.state.count ]),
-                function() {
-                    return this.Text('Even');
-                }
-            ),
+            // this.Conditional(
+            //     this.Element(),
+            //     this.Reactive(c => !(c % 2), [ this.state.count ]),
+            //     function() {
+            //         return this.Text('Even');
+            //     }
+            // ),
 
-            this.Mapper(
-                this.Element(),
-                this.Reactive(x => x, [ this.state.items ]),
-                function(i) {
-                    return this.Element('p', {}, [
-                        this.Text(this.Reactive(x => x[i].name, [ this.state.items ]))
-                    ])
-                }
-            )
+            // this.Mapper(
+            //     this.Element(),
+            //     this.Reactive(x => x, [ this.state.items ]),
+            //     function(i) {
+            //         return this.Element('p', {}, [
+            //             this.Text(this.Reactive(x => x[i].name, [ this.state.items ]))
+            //         ])
+            //     }
+            // )
         ]);
     }
 };

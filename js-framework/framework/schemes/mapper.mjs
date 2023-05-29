@@ -1,17 +1,22 @@
+import ReactiveObject from "../reactivity/reactive.mjs";
 import Component from "./component.mjs";
 
 export default class MapperComponent extends Component {
     constructor(wrapper, parent, reactive, mapperFunc) {
         super(wrapper, parent.props);
         this.state = parent.state;
-
         this.mapperFunc = mapperFunc;
+        
         this.addReactivity(reactive);
     }
 
     addReactivity(reactive) {
-        const updater = this.fixChildCount.bind(this);
-        reactive.activate(updater);
+        reactive.addReactive(
+            new ReactiveObject(
+                this.fixChildCount.bind(this),
+                [ reactive ]
+            )
+        );
     }
 
     fixChildCount(newArr) {

@@ -1,7 +1,6 @@
 import ElementObject from '../nodes/element.mjs';
 import TextObject from '../nodes/text.mjs';
 
-import EffectObject from '../reactivity/effect.mjs';
 import ReactiveObject from '../reactivity/reactive.mjs';
 import StateObject from '../reactivity/state.mjs';
 
@@ -12,13 +11,11 @@ export default class Component {
         wrapper = this.Element(), // component wrapper (components aren't fragments)
         props
     ) {
+        this._wrapper = wrapper;
         this.props = props;
         this.state = {};
 
-        this._wrapper = wrapper;
-        // this._states = [];
         this._reactives = [];
-        this._effects = [];
         this._children = [];
     }
 
@@ -34,16 +31,9 @@ export default class Component {
             this.state[key] = state;
         }
     }
-    
-    Effect(func = () => {}, deps = []) {
-        const boundFunc = func.bind(this);
-        const effect = new EffectObject(boundFunc, deps);
-        this._effects.push(effect);
-        return effect;
-    }
 
-    Reactive(func, deps) {
-        const reactive = new ReactiveObject(func, deps);
+    Reactive(cb, deps) {
+        const reactive = new ReactiveObject(cb, deps);
         this._reactives.push(reactive);
         return reactive;
     }
@@ -59,6 +49,10 @@ export default class Component {
     Component(ComponentClass, wrapper, ...props) {
         const child = this._Component(ComponentClass, wrapper,...props);
         return child._wrapper;
+    }
+
+    printReactiveTree() {
+
     }
 
     // INTERNAL METHODS
@@ -87,10 +81,8 @@ export default class Component {
         this._children = [];
         // 2. cleanup self.
         if (this.onUnmount) this.onUnmount();
-        this._reactives.forEach(r => r.deactivate());
+        this._reactives.forEach(r => r.delete());
         this._reactives = [];
-        this._effects.forEach(e => e.deactivate());
-        this._effects = [];
     }
 
     _unmount() {

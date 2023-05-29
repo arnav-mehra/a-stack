@@ -1,3 +1,4 @@
+import ReactiveObject from "../reactivity/reactive.mjs";
 import Component from "./component.mjs";
 
 export default class ConditionalComponent extends Component {
@@ -12,7 +13,12 @@ export default class ConditionalComponent extends Component {
     }
 
     addReactivity(reactive) {
-        reactive.activate(this.updateBranch.bind(this));
+        reactive.addReactive(
+            new ReactiveObject(
+                this.updateBranch.bind(this),
+                [ reactive ]
+            )
+        );
     }
 
     updateBranch(val) {

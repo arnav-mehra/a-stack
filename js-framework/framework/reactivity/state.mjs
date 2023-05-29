@@ -1,20 +1,29 @@
 export default class StateObject {
     constructor(initialValue) {
         this.value = initialValue;
-        this.callbacks = new Set();
+        this.reactives = new Set();
+    }
+
+    addReactive(r) {
+        this.reactives.add(r);
+    }
+
+    removeReactive(r) {
+        this.reactives.delete(r);
     }
 
     setState(update) {
+        const prevValue = this.value;
         this.value = typeof update === 'function'
                      ? update(this.value)
                      : update;
-        
-        const possiblyChanged = this.prevValue === undefined
-                                || this.prevValue !== this.value
-                                || typeof this.value === 'object';
-        if (!possiblyChanged) return;
-        this.prevValue = this.value;
 
-        this.callbacks.forEach(cb => cb());
+        const possiblyChanged = prevValue === undefined
+                                || prevValue !== this.value
+                                || (typeof this.value === 'object'
+                                    && typeof prevValue === 'object');
+        if (!possiblyChanged) return;
+
+        this.reactives.forEach(r => r.runWithArgs(this.value));
     }
 }

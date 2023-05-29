@@ -18,6 +18,6 @@ export default class TextObject {
     }
 
     addReactivity(reactive) {
-        reactive.activate(this.updateText.bind(this));
+        reactive.setCallback(this.updateText.bind(this));
     }
 }

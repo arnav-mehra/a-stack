@@ -24,7 +24,7 @@ export default class ElementObject {
                 continue;
             }
             if (val instanceof ReactiveObject) {
-                val.activate(this.setProp.bind(this, key));
+                val.setCallback(this.setProp.bind(this, key));
                 continue;
             }
             this.setProp(key, val);
