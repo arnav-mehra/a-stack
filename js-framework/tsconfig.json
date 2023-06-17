@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "strictNullChecks": false,
+        "lib": [
+            "ES2023"
+        ],
+        "module": "CommonJS"
+    }
+}

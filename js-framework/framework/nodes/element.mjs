@@ -1,39 +1,38 @@
 import ReactiveObject from "../reactivity/reactive.mjs";
 
-export default class ElementObject {
-    constructor(
-        tag = 'div',
-        props = {}, // { key: [value || ReactiveObject] }
-        children = [] // ElementObject[]
-    ) {
-        this.ref = document.createElement(tag);
-        this.setProps(props);
-        this.setChildren(children);
-    }
+export default function Element(
+    tag = 'div',
+    props = {}, // { key: [value || ReactiveObject] }
+    children = [] // HTMLElement[]
+) {
+    const ref = document.createElement(tag);
+    setProps(ref, props);
+    setChildren(ref, children);
+    return ref;
+}
 
-    setProp(key, val) {
-        this.ref.setAttribute(key, val);
-    }
-
-    setProps(props) {
-        for (const [ key, val ] of Object.entries(props)) {
-            // TO-DO: Add support for more events
-            // TO-DO: Add support for reactive event listeners
-            if (key === 'onclick') {
-                this.ref.addEventListener('click', val);
-                continue;
-            }
-            if (val instanceof ReactiveObject) {
-                val.setCallback(this.setProp.bind(this, key));
-                continue;
-            }
-            this.setProp(key, val);
+function setProps(ref, props) {
+    for (const [ key, val ] of Object.entries(props)) {
+        // TO-DO: Add support for more events
+        // TO-DO: Add support for reactive event listeners
+        if (key === 'onclick') {
+            ref.addEventListener('click', val);
+            continue;
         }
-    }
-
-    setChildren(children) {
-        for (const child of children) {
-            this.ref.appendChild(child.ref);
+        if (val instanceof ReactiveObject) {
+            new ReactiveObject(
+                ref.setAttribute.bind(ref, key),
+                [ val ]
+            );
+            val.run();
+            continue;
         }
+        ref.setAttribute(key, val);
+    }
+}
+
+function setChildren(ref, children) {
+    for (const child of children) {
+        ref.appendChild(child);
     }
 }

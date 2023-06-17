@@ -1,5 +1,5 @@
-import ElementObject from '../nodes/element.mjs';
-import TextObject from '../nodes/text.mjs';
+import Element from '../nodes/element.mjs';
+import Text from '../nodes/text.mjs';
 
 import ReactiveObject from '../reactivity/reactive.mjs';
 import StateObject from '../reactivity/state.mjs';
@@ -9,9 +9,10 @@ import StateObject from '../reactivity/state.mjs';
 export default class Component {
     constructor(
         wrapper = this.Element(), // component wrapper (components aren't fragments)
-        props
+        props = {} // props passed down to component
     ) {
         this._wrapper = wrapper;
+
         this.props = props;
         this.state = {};
 
@@ -39,11 +40,11 @@ export default class Component {
     }
 
     Text(input) {
-        return new TextObject(input);
+        return Text(input);
     }
 
     Element(tag, props, children) {
-        return new ElementObject(tag, props, children);
+        return Element(tag, props, children);
     }
 
     Component(ComponentClass, wrapper, ...props) {
@@ -51,16 +52,15 @@ export default class Component {
         return child._wrapper;
     }
 
-    printReactiveTree() {
-
-    }
+    printReactiveTree() {}
 
     // INTERNAL METHODS
 
     _Component(ComponentClass, wrapper, ...props) {
         const child = new ComponentClass(wrapper, ...props);
+        console.log(child)
         this._children.push(child);
-        this._wrapper.ref.appendChild(child._wrapper.ref);
+        this._wrapper.appendChild(child._wrapper);
         return child;
     }
 
@@ -71,7 +71,7 @@ export default class Component {
         // 2. do steps 1-3 for all children.
         this._children.forEach(c => c._mount());
         // 3. mount the node.
-        if (this._root) this._wrapper.ref.appendChild(this._root.ref);
+        if (this._root) this._wrapper.appendChild(this._root);
         if (this.onMount) this.onMount();
     }
 
@@ -88,7 +88,7 @@ export default class Component {
     _unmount() {
         if (!this._root) return;
         this._recursiveCleanup();
-        this._root.ref.remove();
+        this._root.remove();
         this._root = undefined;
     }
 }

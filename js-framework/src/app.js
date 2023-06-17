@@ -35,24 +35,45 @@ export default class App extends Component {
                 //     c => `color: ${c};`, [ this.state.color ]
                 // ),
                 onclick: () => {
-                    this.state.count.setState(prev => prev + 1);
+                    // this.state.count.setState(prev => prev + 1);
+                    this.state.items.setState(prev => {
+                        prev.pop();
+                        return prev;
+                    });
                     // this.state.items.setState(prev => {
-                    //     prev.pop();
+                    //     prev[0].name = 'pp';
                     //     return prev;
-                    // });
+                    // })
                     // this.state.color.setState(prev => prev === 'red' ? 'blue' : 'red');
                 },
             }, [
                 this.Text('Click Me!')
             ]),
-            
-            this.Conditional(
-                this.Element(),
-                this.Reactive(c => c % 2, [ this.state.count ]),
-                function() {
-                    return this.Text('Odd');
+
+            this.Element('button', {
+                onclick: () => {
+                    this.state.items.setState(prev => {
+                        prev.push({ name: 'Item ' + (prev.length + 1) });
+                        return prev;
+                    });
                 }
+            }, [
+                this.Text('Click Me!')
+            ]),
+            
+            this.Text(
+                this.Reactive(
+                    x => !!x.length, [ this.state.items ] 
+                )
             ),
+
+            // this.Conditional(
+            //     this.Element(),
+            //     this.Reactive(c => c % 2, [ this.state.count ]),
+            //     function() {
+            //         return this.Text('Odd');
+            //     }
+            // ),
             // this.Conditional(
             //     this.Element(),
             //     this.Reactive(c => !(c % 2), [ this.state.count ]),
@@ -61,15 +82,15 @@ export default class App extends Component {
             //     }
             // ),
 
-            // this.Mapper(
-            //     this.Element(),
-            //     this.Reactive(x => x, [ this.state.items ]),
-            //     function(i) {
-            //         return this.Element('p', {}, [
-            //             this.Text(this.Reactive(x => x[i].name, [ this.state.items ]))
-            //         ])
-            //     }
-            // )
+            this.Mapper(
+                this.Element(),
+                this.Reactive(x => x, [ this.state.items ]),
+                function(i) {
+                    return this.Element('p', {}, [
+                        this.Text(this.Reactive(x => x[i].name, [ this.state.items ]))
+                    ])
+                }
+            )
         ]);
     }
 };

@@ -4,10 +4,7 @@ import App from "./app.js";
 
 class Root extends Component {
     constructor() {
-        super();
-        const element = this.Element();
-        element.ref = document.body;
-        this._wrapper = element;
+        super(document.body);
     }
 
     render() {

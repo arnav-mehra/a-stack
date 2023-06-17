@@ -6,17 +6,17 @@ export default class MapperComponent extends Component {
         super(wrapper, parent.props);
         this.state = parent.state;
         this.mapperFunc = mapperFunc;
+        console.log(this)
+        console.log(reactive)
         
         this.addReactivity(reactive);
     }
 
     addReactivity(reactive) {
-        reactive.addReactive(
-            new ReactiveObject(
-                this.fixChildCount.bind(this),
-                [ reactive ]
-            )
-        );
+        new ReactiveObject(
+            this.fixChildCount.bind(this),
+            [ reactive ]
+        )
     }
 
     fixChildCount(newArr) {
@@ -40,8 +40,9 @@ export default class MapperComponent extends Component {
     }
 
     createChild(i) {
-        const child = this._Component(Component, this.props);
+        const child = this._Component(Component, this.Element(), this.props);
         child.state = this.state;
+
         child.render = this.mapperFunc.bind(child, i);
         return child;
     }

@@ -13,11 +13,9 @@ export default class ConditionalComponent extends Component {
     }
 
     addReactivity(reactive) {
-        reactive.addReactive(
-            new ReactiveObject(
-                this.updateBranch.bind(this),
-                [ reactive ]
-            )
+        new ReactiveObject(
+            this.updateBranch.bind(this),
+            [ reactive ]
         );
     }
 

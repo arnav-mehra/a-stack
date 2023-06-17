@@ -24,6 +24,6 @@ export default class StateObject {
                                     && typeof prevValue === 'object');
         if (!possiblyChanged) return;
 
-        this.reactives.forEach(r => r.runWithArgs(this.value));
+        this.reactives.forEach(r => r.run());
     }
 }
