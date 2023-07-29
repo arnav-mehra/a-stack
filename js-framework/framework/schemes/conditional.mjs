@@ -2,11 +2,11 @@ import ReactiveObject from "../reactivity/reactive.mjs";
 import Component from "./component.mjs";
 
 export default class ConditionalComponent extends Component {
-    constructor(wrapper, parent, reactive, trueFunc) {
+    constructor(wrapper, parent, reactive, trueRenderFunc) {
         super(wrapper);
 
         const child = this._Component(Component, parent.props);
-        child.render = trueFunc.bind(child);
+        child.render = trueRenderFunc.bind(child);
         child.state = parent.state;
 
         this.addReactivity(reactive);

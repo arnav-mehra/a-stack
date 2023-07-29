@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "strictNullChecks": false,
+        "allowImportingTsExtensions": true,
+        "noEmit": true,
+
+        // "isolatedModules": true,
+        // "useDefineForClassFields": true,
+
+        "module": "ES6",
+        "target": "ES6",
+        "lib": [ "ES2023", "DOM" ],
+        "outDir": "./dist/",
+        "rootDir": "./framework/"
+    }
+}

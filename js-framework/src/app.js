@@ -60,12 +60,6 @@ export default class App extends Component {
             }, [
                 this.Text('Click Me!')
             ]),
-            
-            this.Text(
-                this.Reactive(
-                    x => !!x.length, [ this.state.items ] 
-                )
-            ),
 
             // this.Conditional(
             //     this.Element(),
