@@ -1,0 +1,32 @@
+{
+  "name": "ts-rewrite",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.mts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "play-once": "cd playground && rollup -c && cd .. && cd server-lib && node main.js",
+    "play": "nodemon -e html --exec \"\"npm run-script play-once\"\""
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.22.9",
+    "@babel/preset-env": "^7.22.9",
+    "@types/node": "^20.4.5",
+    "babel-loader": "^9.1.3",
+    "rollup": "^3.27.0",
+    "rollup-plugin-minification": "^0.2.0",
+    "ts-loader": "^9.4.3",
+    "typescript": "^5.1.6",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "@open-wc/building-rollup": "^3.0.1",
+    "@rollup/plugin-terser": "^0.4.3",
+    "deepmerge": "^4.3.1",
+    "http": "^0.0.1-security",
+    "mime": "^3.0.0"
+  }
+}

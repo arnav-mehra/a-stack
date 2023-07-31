@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "target": "ES2018",
+        "module": "ESNext",
+        "moduleResolution": "Node",
+        "noEmitOnError": true,
+        "lib": [ "ES2017", "DOM" ],
+        // "strict": true,
+        "esModuleInterop": false,
+        "outDir": "./build/",
+        "rootDir": "./src/",
+    }
+}
