@@ -1,6 +1,6 @@
 import {
     Component, hydrate
-} from '../client-lib/dist/bundle';
+} from '../../client-lib/dist/bundle';
 
 export class Hello extends Component {
     constructor(props) {
@@ -13,12 +13,9 @@ export class Hello extends Component {
     
     render() {
         return (
-            this.Element(
-                "div", {},
-                [
-                    this.Text("hi")
-                ]
-            )
+            this.Element("div", {}, [
+                this.Text("hi")
+            ])
         )
     }
 }
