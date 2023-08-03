@@ -7,6 +7,9 @@ const PORT = 8000;
 
 const server = http.createServer(requestListener);
 
-server.listen(PORT, HOST, async () => {
-    loadPages();
-});
+server.listen(
+    PORT, HOST,
+    async () => {
+        loadPages();
+    }
+);
