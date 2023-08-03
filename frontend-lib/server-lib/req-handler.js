@@ -9,10 +9,8 @@ const patchRoute = (route) => {
 }
 
 const requestListener = function (req, res) {
-    const route = patchRoute(req.url); 
-    // console.log(route);
-    // console.log(Object.keys(PAGES));
-
+    const route = patchRoute(req.url);
+    
     res.setHeader('Content-Type', mime.getType(route));
 
     if (!PAGES[route]) {

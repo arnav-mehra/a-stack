@@ -1,3 +1,5 @@
+// HTML Templating/Generation
+
 function ClientEntry(
     name,
     props
@@ -61,4 +63,4 @@ class ServerComponent {
 module.exports = {
     ClientEntry,
     ServerComponent
-}
+};
