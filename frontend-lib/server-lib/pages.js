@@ -25,7 +25,7 @@ const loadPage = (rpath) => {
     if (rpath.includes("client.mjs")) {
         loadClientJS(rpath);
         return;
-    } 
+    }
     if (rpath.includes("server.cjs")) {
         loadServerHTML(rpath);
         return;
