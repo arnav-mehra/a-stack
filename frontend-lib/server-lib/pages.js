@@ -9,7 +9,7 @@ const DIST_FOLDER = PLAYGROUND_FOLDER + 'dist\\';
 const SRC_FOLDER = PLAYGROUND_FOLDER + 'src\\';
 
 const PAGES = {};
- 
+
 const loadPages = (dir = SRC_FOLDER) => {
     fs.readdirSync(dir).forEach(fname => {
         const rpath = path.join(dir, fname);
