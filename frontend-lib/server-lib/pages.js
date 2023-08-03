@@ -7,6 +7,7 @@ const exec = require('child_process').exec;
 const PLAYGROUND_FOLDER = 'playground\\';
 const DIST_FOLDER = PLAYGROUND_FOLDER + 'dist\\';
 const SRC_FOLDER = PLAYGROUND_FOLDER + 'src\\';
+
 const PAGES = {};
 
 const loadPages = (dir = SRC_FOLDER) => {
