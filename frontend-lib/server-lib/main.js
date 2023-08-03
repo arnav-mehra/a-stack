@@ -11,5 +11,6 @@ server.listen(
     PORT, HOST,
     async () => {
         loadPages();
+        console.log("listening...");
     }
 );
