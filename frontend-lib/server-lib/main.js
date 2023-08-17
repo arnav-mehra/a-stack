@@ -1,5 +1,5 @@
 const http = require("http");
-const { loadPages } = require('./pages');
+const { loadPages, PAGES } = require('./pages');
 const { requestListener } = require('./req-handler');
 
 const HOST = 'localhost';
@@ -12,6 +12,7 @@ server.listen(
     HOST,
     async () => {
         loadPages();
+        console.log(Object.keys(PAGES));
         console.log("listening...");
     }
 );

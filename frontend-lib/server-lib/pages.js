@@ -5,12 +5,12 @@ const path = require('path');
 const exec = require('child_process').exec;
 
 const PLAYGROUND_FOLDER = 'playground\\';
-const DIST_FOLDER = PLAYGROUND_FOLDER + 'dist\\';
-const SRC_FOLDER = PLAYGROUND_FOLDER + 'src\\';
+const DIST_FOLDER = 'dist\\';
+const SRC_FOLDER = 'src\\';
 
 const PAGES = {};
 
-const loadPages = (dir = SRC_FOLDER) => {
+const loadPages = (dir = PLAYGROUND_FOLDER + SRC_FOLDER) => {
     fs.readdirSync(dir).forEach(fname => {
         const rpath = path.join(dir, fname);
         if (fs.statSync(rpath).isDirectory()) {
@@ -35,40 +35,33 @@ const loadPage = (rpath) => {
 const addPage = (route, content) => {
     route = route.replaceAll('\\', '/');
     PAGES[route] = content;
-}
+};
 
-const loadClientJS = (rpath) => {
-    const dpath = rpath.replace(SRC_FOLDER, DIST_FOLDER)
-                       .replace("client.mjs", "bundle.js");
-    const rel_dpath = dpath.replace(PLAYGROUND_FOLDER, "");
-    const rel_rpath = rpath.replace(PLAYGROUND_FOLDER, "");
-    
-    console.log("rollup:\t", rel_rpath, "\t=>", rel_dpath);
+const loadClientJS = (path) => {
+    const origin = path.replace(PLAYGROUND_FOLDER + SRC_FOLDER, "");
+    const target = origin.replace("client.mjs", "bundle.js");
+
+    console.log("rollup:\t", SRC_FOLDER + origin, "\t=>", DIST_FOLDER + target);
     exec(
-        `cd ${PLAYGROUND_FOLDER} && rollup -f es -i ${rel_rpath} -o ${rel_dpath}`,
-        (err, stdout, stderr) => { /* console.log({err, stdout, stderr}) */ }
+        `cd ${PLAYGROUND_FOLDER} && rollup -f es -i ${SRC_FOLDER + origin} -o ${DIST_FOLDER + target}`,
+        () => {} // (err, stdout, stderr) => { console.log({err, stdout, stderr}) }
     );
 
-    const route = rpath.replace(SRC_FOLDER, "");
-    const content = fs.readFileSync(dpath).toString();
-    addPage(route, content);
-}
+    const content = fs.readFileSync(PLAYGROUND_FOLDER + DIST_FOLDER + target).toString();
+    addPage(target, content);
+};
 
-const loadServerHTML = (rpath) => {
-    const route = rpath.replace(SRC_FOLDER, "");
-    const IndexComponent = require('..\\' + rpath);
+const loadServerHTML = (path) => {
+    const origin = path.replace(PLAYGROUND_FOLDER + SRC_FOLDER, "");
+    const target = origin.replace("server.cjs", "index.html");
+
+    console.log("ssg:\t", SRC_FOLDER + origin, "\t=>", DIST_FOLDER + target);      
+    const IndexComponent = require('..\\' + path);
     const content = new IndexComponent()._render();
-    
-    const dpath = rpath.replace(SRC_FOLDER, DIST_FOLDER)
-                       .replace("server.cjs", "index.html");
+    fs.writeFileSync(PLAYGROUND_FOLDER + DIST_FOLDER + target, content, console.log);
 
-    const rel_dpath = dpath.replace(PLAYGROUND_FOLDER, "");
-    const rel_rpath = rpath.replace(PLAYGROUND_FOLDER, "");
-    console.log("ssr:\t", rel_rpath, "\t=>", rel_dpath);         
-    fs.writeFileSync(dpath, content, console.log);
-
-    addPage(route, content);
-}
+    addPage(target, content);
+};
 
 module.exports = {
     PAGES,
