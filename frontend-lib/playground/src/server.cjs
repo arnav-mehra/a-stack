@@ -7,13 +7,16 @@ class Index extends ServerComponent {
     constructor() {
         super();
         this.title = "Hi Page";
+        this.styleSheets = [
+            'main.css',
+            'bootstrap.min.css',
+            'currentStyle.css'
+        ];
     }
     
     render() { 
         return (
-            this.Element("div", {}, [
-                "hi"
-            ])
+            ClientEntry("Hello")
         ) 
     }
 }

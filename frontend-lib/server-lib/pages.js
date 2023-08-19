@@ -30,11 +30,26 @@ const loadPage = (rpath) => {
         loadServerHTML(rpath);
         return;
     }
+    loadOtherFile(rpath);
 };
 
 const addPage = (route, content) => {
     route = route.replaceAll('\\', '/');
     PAGES[route] = content;
+};
+
+const loadOtherFile = (path) => {
+    const origin = path.replace(PLAYGROUND_FOLDER + SRC_FOLDER, "");
+    const target = origin;
+
+    console.log("copy:\t", SRC_FOLDER + origin, "\t=>", DIST_FOLDER + target);
+    exec(
+        `cd ${PLAYGROUND_FOLDER} && copy ${SRC_FOLDER + origin} ${DIST_FOLDER + target}`,
+        () => {} // (err, stdout, stderr) => { console.log({err, stdout, stderr}) }
+    );
+
+    const content = fs.readFileSync(PLAYGROUND_FOLDER + SRC_FOLDER + target).toString();
+    addPage(target, content);
 };
 
 const loadClientJS = (path) => {

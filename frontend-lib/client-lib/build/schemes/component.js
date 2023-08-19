@@ -45,12 +45,13 @@ export default class Component {
         const child = new ComponentClass(wrapper, props, ...args);
         console.log(child);
         this._children.push(child);
-        this._wrapper.appendChild(child._wrapper);
         return child;
     }
     _mount() {
         if (this._root)
             return;
+        if (this.onMount)
+            this.onMount();
         // 1. create this component's DOM tree.
         this._root = this.render();
         // 2. do steps 1-3 for all children.
@@ -58,8 +59,6 @@ export default class Component {
         // 3. mount the node.
         if (this._root)
             this._wrapper.appendChild(this._root);
-        if (this.onMount)
-            this.onMount();
     }
     _recursiveCleanup() {
         // 1. cleanup chlidren.

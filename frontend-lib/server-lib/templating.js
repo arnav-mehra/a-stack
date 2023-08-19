@@ -1,14 +1,16 @@
 // HTML Templating/Generation
 
+const path = require("path");
+const fs = require("fs");
+
 function ClientEntry(
     name,
-    props
+    props = {}
 ) {
     return (
         `<component name=${name}`
         + Object.entries(props)
-                .map(([key, value]) => `${key}=${value}`)
-                .join(' ')
+                .map(([key, value]) => ` ${key}=${value}`)
         + `></component>`
     );
 };
@@ -40,6 +42,12 @@ class ServerComponent {
         return html;
     }
 
+    styleSheetImports() {
+        return (this.styleSheets || [])
+            .map(relUrl => `<style>@import url("${relUrl}")</style>`)
+            .join('\n');
+    }
+
     _render() {
         const body = this.render();
         return (
@@ -50,6 +58,7 @@ class ServerComponent {
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="bundle.js" type="module"></script>
+        ${this.styleSheetImports()}
         <title>${this.title}</title>
     </head>
     <body>

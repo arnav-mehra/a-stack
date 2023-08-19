@@ -100,19 +100,18 @@ export default class Component {
         const child = new ComponentClass(wrapper, props, ...args);
         console.log(child)
         this._children.push(child);
-        this._wrapper.appendChild(child._wrapper);
         return child;
     }
 
     _mount(): void {
         if (this._root) return;
+        if (this.onMount) this.onMount();
         // 1. create this component's DOM tree.
         this._root = this.render();
         // 2. do steps 1-3 for all children.
         this._children.forEach(c => c._mount());
         // 3. mount the node.
         if (this._root) this._wrapper.appendChild(this._root);
-        if (this.onMount) this.onMount();
     }
 
     _recursiveCleanup(): void {
