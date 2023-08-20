@@ -44,7 +44,7 @@ class ServerComponent {
 
     styleSheetImports() {
         return (this.styleSheets || [])
-            .map(relUrl => `<style>@import url("${relUrl}")</style>`)
+            .map(relUrl => `<link href="${relUrl}" rel="stylesheet"/>`)
             .join('\n');
     }
 
@@ -55,13 +55,11 @@ class ServerComponent {
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="bundle.js" type="module"></script>
-        ${this.styleSheetImports()}
         <title>${this.title}</title>
+        ${this.styleSheetImports()}
+        <script src="bundle.js" type="module"></script>
     </head>
-    <body>
+    <body id="main">
         ${body}
     </body>
 </html>`

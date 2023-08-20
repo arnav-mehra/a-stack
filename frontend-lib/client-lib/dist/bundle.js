@@ -45,9 +45,6 @@ class ReactiveObject {
     delete() {
         this.deps.forEach(d => d.removeReactive(this));
         this.deps = undefined;
-        this.reactives.forEach(r => r.delete());
-        this.reactives = undefined;
-        this.value = undefined;
     }
     removeReactive(r) {
         this.reactives.delete(r);
@@ -166,25 +163,25 @@ class Component {
     _mount() {
         if (this._root)
             return;
-        if (this.onMount)
-            this.onMount();
         // 1. create this component's DOM tree.
         this._root = this.render();
         // 2. do steps 1-3 for all children.
         this._children.forEach(c => c._mount());
         // 3. mount the node.
+        if (this.onMount)
+            this.onMount();
         if (this._root)
             this._wrapper.appendChild(this._root);
     }
     _recursiveCleanup() {
         // 1. cleanup chlidren.
         this._children.forEach(c => c._recursiveCleanup());
-        this._children = [];
+        this._children = undefined;
         // 2. cleanup self.
         if (this.onUnmount)
             this.onUnmount();
         this._reactives.forEach(r => r.delete());
-        this._reactives = [];
+        this._reactives = undefined;
     }
     _unmount() {
         if (!this._root)
@@ -198,11 +195,7 @@ class Component {
 const hydrate = () => {
     const parents = Array.from(document.getElementsByTagName('component'));
     for (const parent of parents) {
-        if (parent.childElementCount) {
-            continue; // avoid double hydration.
-        }
-        const comp = initComponent(parent);
-        comp._mount();
+        initComponent(parent);
     }
 };
 const initComponent = (parent) => {
@@ -216,7 +209,14 @@ const initComponent = (parent) => {
     }
     const className = propMap['name'];
     const CompClass = eval(className);
-    return new CompClass(parent, propMap);
+    // mount off the dom tree.
+    const wrapper = Element();
+    const comp = new CompClass(wrapper, propMap);
+    comp._mount();
+    // swap into dom tree.
+    const replacement = wrapper.children[0];
+    wrapper.removeChild(replacement);
+    parent.replaceWith(replacement);
 };
 
 class ConditionalComponent extends Component {

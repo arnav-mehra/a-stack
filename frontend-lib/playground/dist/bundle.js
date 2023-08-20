@@ -45,9 +45,6 @@ class ReactiveObject {
     delete() {
         this.deps.forEach(d => d.removeReactive(this));
         this.deps = undefined;
-        this.reactives.forEach(r => r.delete());
-        this.reactives = undefined;
-        this.value = undefined;
     }
     removeReactive(r) {
         this.reactives.delete(r);
@@ -166,25 +163,25 @@ class Component {
     _mount() {
         if (this._root)
             return;
-        if (this.onMount)
-            this.onMount();
         // 1. create this component's DOM tree.
         this._root = this.render();
         // 2. do steps 1-3 for all children.
         this._children.forEach(c => c._mount());
         // 3. mount the node.
+        if (this.onMount)
+            this.onMount();
         if (this._root)
             this._wrapper.appendChild(this._root);
     }
     _recursiveCleanup() {
         // 1. cleanup chlidren.
         this._children.forEach(c => c._recursiveCleanup());
-        this._children = [];
+        this._children = undefined;
         // 2. cleanup self.
         if (this.onUnmount)
             this.onUnmount();
         this._reactives.forEach(r => r.delete());
-        this._reactives = [];
+        this._reactives = undefined;
     }
     _unmount() {
         if (!this._root)
@@ -198,11 +195,7 @@ class Component {
 const hydrate = () => {
     const parents = Array.from(document.getElementsByTagName('component'));
     for (const parent of parents) {
-        if (parent.childElementCount) {
-            continue; // avoid double hydration.
-        }
-        const comp = initComponent(parent);
-        comp._mount();
+        initComponent(parent);
     }
 };
 const initComponent = (parent) => {
@@ -216,7 +209,14 @@ const initComponent = (parent) => {
     }
     const className = propMap['name'];
     const CompClass = eval(className);
-    return new CompClass(parent, propMap);
+    // mount off the dom tree.
+    const wrapper = Element();
+    const comp = new CompClass(wrapper, propMap);
+    comp._mount();
+    // swap into dom tree.
+    const replacement = wrapper.children[0];
+    wrapper.removeChild(replacement);
+    parent.replaceWith(replacement);
 };
 
 class ConditionalComponent extends Component {
@@ -287,193 +287,253 @@ const adjectives = ["pretty", "large", "big", "small", "tall", "short", "long", 
 const colours = ["red", "yellow", "blue", "green", "pink", "brown", "purple", "brown", "white", "black", "orange"];
 const nouns = ["table", "chair", "house", "bbq", "desk", "car", "pony", "cookie", "sandwich", "burger", "pizza", "mouse", "keyboard"];  
 
-const buttonStyle = `
-    display: block;
-    width: 100%;    
-    color: #fff;
-    background-color: #337ab7;
-    border-color: #2e6da4;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    margin: 10px 0px;
-    padding: 6px 12px;
-`;
-
 class Hello extends Component {
     constructor(props) {
         super(props);
+        
+        this.State({
+            id: 1,
+            backup: null,
+            start: 0,
+            d: {
+                arr: [],
+                selected: null
+            }
+        });
+        this.props.select = this.select.bind(this);
+        this.props.delete = this.delete.bind(this);
     }
 
-    onMount() {
-        this.State({
-            arr: [],
-            id: 1
+    removeAllRows() {
+        this.state.d.setState(d => {
+            d.arr.length = 0;
+            d.selected = null;
+            return d;
         });
     }
 
-    appendData(count) {
-        this.state.arr.setState(arr => {
+    buildData(count, clear = false, selected = null) {
+        this.state.d.setState(d => {
+            if (clear) d.arr.length = 0;
             for (var i = 0; i < count; i++) {
                 const label = (
                     adjectives[_random(adjectives.length)]
                     + " " + colours[_random(colours.length)]
                     + " " + nouns[_random(nouns.length)]
                 );
-                arr.push({ id: this.state.id.value, label });
+                d.arr.push({ id: this.state.id.value, label });
                 this.state.id.setState(id => id + 1);
             }
-            console.log(arr);
-            return arr;
-        });
-    }
-
-    createData(count) {
-        this.state.arr.setState(arr => {
-            arr.length = 0;
-            for (var i = 0; i < count; i++) {
-                const label = (
-                    adjectives[_random(adjectives.length)]
-                    + " " + colours[_random(colours.length)]
-                    + " " + nouns[_random(nouns.length)]
-                );
-                arr.push({ id: i, label });
-            }
-            console.log(arr);
-            return arr;
-        });
-    }
-
-    clearData() {
-        this.state.arr.setState(arr => {
-            arr.length = 0;
-            console.log(arr);
-            return arr;
-        });
-    }
-
-    updateData() {
-        this.state.arr.setState(arr => {
-            for (let i = 0; i < arr.length; i += 10) {
-                const label = (
-                    adjectives[_random(adjectives.length)]
-                    + " " + colours[_random(colours.length)]
-                    + " " + nouns[_random(nouns.length)]
-                );
-                arr[i].label = label;
-            }
-        });
-    }
-
-    removeRow(i) {
-        this.state.arr.setState(arr => {
-            arr.splice(i, 1);
-            return arr;
+            d.selected = selected;
+            return d;
         });
     }
     
+    updateData(selected = null) {
+        this.state.d.setState(d => {
+            for (let i = 0; i < d.arr.length; i += 10) {
+                d.arr[i].label += " !!!";
+            }
+            d.selected = selected;
+            return d;
+        });
+    }
+
+    delete(i) {
+        this.state.d.setState(d => {
+            d.arr.splice(i, 1);
+            return d;
+        });
+    }
+
+    run() {
+        this.buildData(1000, true, null);
+    }
+
+    add() {
+        this.buildData(1000, false, null);
+    }
+
+    update() {
+        this.updateData(null);
+    }
+
+    select(i) {
+        this.state.d.setState(_ => {
+            d.selected = i;
+            return d;
+        });
+    }
+
+    hideAll() {
+        this.state.backup.setState(_ => this.state.arr.value);
+        this.removeAllRows();
+    }
+
+    showAll() {
+        this.state.d.setState(d => {
+            d.arr.push(...this.state.backup.value);
+            d.selected = null;
+            return d;
+        });
+        this.state.backup.setState(_ => null);
+    }
+
+    runLots() {
+        this.buildData(10000, true, null);
+    }
+
+    clear() {
+        this.removeAllRows();
+    }
+
+    swapData() {
+        this.state.d.setState(d => {
+            if (d.arr.length > 998) {
+                var a = d.arr[1];
+                d.arr[1] = d.arr[998];
+                d.arr[998] = a;
+            }
+            d.selected = null;
+            return d;
+        });
+    }
+
     render() {
         return (
-            this.Element("div", {}, [
-                this.Element("div", {
-                    style: `
-                        background: lightgray;
-                        padding: 10px;
-                        border-radius: 8px;
-                    `
-                }, [
-                    this.Element("div", {
-                        style: `
-                            text-align: center;
-                            font-size: 30px;
-                            margin: 10px 0px 20px 0px;
-                        `
-                    }, [
-                        this.Text("A-Stack (non-keyed)")
-                    ]),
+            this.Element("div", { class: "container" }, [
+                this.Element("div", { class: "jumbotron" }, [
+                    this.Element("div", { class: "row" }, [
+                        // TITLE
+                        this.Element("div", { class: "col-md-6" }, [
+                            this.Element("h1", {}, [
+                                this.Text("A-Stack (non-keyed)")
+                            ])
+                        ]),
 
-                    this.Element("button", {
-                        onclick: this.createData.bind(this, 1000),
-                        style: buttonStyle
-                    }, [
-                        this.Text("Create 1,000 rows")
-                    ]),
+                        // BUTTONS
+                        this.Element("div", { class: "col-md-6" }, [
+                            this.Element("div", { class: "row" }, [
+                                this.Element("div", { class: "col-sm-6 smallpad" }, [
+                                    this.Element("button", {
+                                        onclick: this.run.bind(this, 1000),
+                                        class: 'btn btn-primary btn-block',
+                                        type: 'button',
+                                        id: 'run'
+                                    }, [
+                                        this.Text("Create 1,000 rows")
+                                    ])
+                                ]),
 
-                    this.Element("button", {
-                        onclick: this.createData.bind(this, 10000),
-                        style: buttonStyle
-                    }, [
-                        this.Text("Create 10,000 rows")
-                    ]),
+                                this.Element("div", { class: "col-sm-6 smallpad" }, [
+                                    this.Element("button", {
+                                        onclick: this.runLots.bind(this),
+                                        class: 'btn btn-primary btn-block',
+                                        type: 'button',
+                                        id: 'runlots'
+                                    }, [
+                                        this.Text("Create 10,000 rows")
+                                    ])
+                                ]),
 
-                    this.Element("button", {
-                        onclick: this.appendData.bind(this, 1000),
-                        style: buttonStyle
-                    }, [
-                        this.Text("Append 1,000 rows")
-                    ]),
+                                this.Element("div", { class: "col-sm-6 smallpad" }, [
+                                    this.Element("button", {
+                                        onclick: this.add.bind(this),
+                                        class: 'btn btn-primary btn-block',
+                                        type: 'button',
+                                        id: 'add'
+                                    }, [
+                                        this.Text("Append 1,000 rows")
+                                    ])
+                                ]),
 
-                    this.Element("button", {
-                        onclick: this.updateData.bind(this, 1000),
-                        style: buttonStyle
-                    }, [
-                        this.Text("Update every 10th row")
-                    ]),
+                                this.Element("div", { class: "col-sm-6 smallpad" }, [
+                                    this.Element("button", {
+                                        onclick: this.update.bind(this),
+                                        class: 'btn btn-primary btn-block',
+                                        type: 'button',
+                                        id: 'update'
+                                    }, [
+                                        this.Text("Update every 10th row")
+                                    ])
+                                ]),
 
-                    this.Element("button", {
-                        onclick: this.clearData.bind(this),
-                        style: buttonStyle
-                    }, [
-                        this.Text("clear")
-                    ]),
+                                this.Element("div", { class: "col-sm-6 smallpad" }, [
+                                    this.Element("button", {
+                                        onclick: this.clear.bind(this),
+                                        class: 'btn btn-primary btn-block',
+                                        type: 'button',
+                                        id: 'clear'
+                                    }, [
+                                        this.Text("clear")
+                                    ])
+                                ]),
 
-                    this.Element("button", {
-                        onclick: this.clearData.bind(this),
-                        style: buttonStyle
-                    }, [
-                        this.Text("Swap Rows")
-                    ]),
-                ]),                
+                                this.Element("div", { class: "col-sm-6 smallpad" }, [
+                                    this.Element("button", {
+                                        onclick: this.swapData.bind(this),
+                                        class: 'btn btn-primary btn-block',
+                                        type: 'button',
+                                        id: 'swaprows'
+                                    }, [
+                                        this.Text("Swap Rows")
+                                    ])
+                                ])
+                            ])
+                        ])
+                    ])
+                ]),
 
+                // TABLE
                 this.Element("table", {
                     class: 'table table-hover table-striped test-data'
                 }, [
                     this.Mapper(
-                        this.Element("tbody"),
-                        this.Reactive(x => x, [ this.state.arr ]),
+                        this.Element("tbody", { id: 'tbody' }),
+                        this.Reactive(d => d.arr, [ this.state.d ]),
                         function(i) {
-                            const labelReactive = this.Reactive(x => x[i].label, [this.state.arr]);
-                            const idReactive = this.Reactive(x => x[i].id, [this.state.arr]);
+                            const selectedReactive = this.Reactive(d => d.selected == i ? 'danger' : '', [ this.state.d ]);
+                            const itemReactive = this.Reactive(d => d.arr[i], [ this.state.d ]);
+                            const idReactive = this.Reactive(x => x.id, [ itemReactive ]);
+                            const labelReactive = this.Reactive(x => x.label, [ itemReactive ]);
+
                             return (
-                                this.Element("tr", {}, [
-                                    this.Element("td", {
-                                        class: 'col-md-1'
-                                    }, [
+                                this.Element("tr", {
+                                    class: selectedReactive,
+                                }, [
+                                    this.Element("td", { class: 'col-md-1' }, [
                                         this.Text(idReactive)
                                     ]),
-                                    this.Element("td", {
-                                        class: 'col-md-4'
-                                    }, [
-                                        this.Element("a", {}, [
+                                    this.Element("td", { class: 'col-md-4' }, [
+                                        this.Element("a", {
+                                            class: "lbl",
+                                            onclick: () => this.props.select(i)
+                                        }, [
                                             this.Text(labelReactive)
                                         ]),
                                     ]),
-                                    this.Element("td", {
-                                        style: 'col-md-1'
-                                    }, [
-                                        this.Element("a", {}, [
-                                            this.Element("span", {}, [
-                                                this.Text('X')
-                                            ]),
+                                    this.Element("td", { class: 'col-md-1' }, [
+                                        this.Element("a", {
+                                            class: "remove",
+                                            onclick: () => this.props.delete(i)
+                                        }, [
+                                            this.Element("span", {
+                                                class: "remove glyphicon glyphicon-remove",
+                                                "aria-hidden": "true"
+                                            })
                                         ]),
                                     ]),
-                                    this.Element("td", {
-                                        style: 'col-md-6'
-                                    })
+                                    this.Element("td", { class: 'col-md-6' })
                                 ])
                             )
                         }
                     )
-                ])
+                ]),
+
+                this.Element("span", {
+                    class: "preloadicon glyphicon glyphicon-remove",
+                    "aria-hidden": "true"
+                })
             ])
         )
     }

@@ -105,23 +105,23 @@ export default class Component {
 
     _mount(): void {
         if (this._root) return;
-        if (this.onMount) this.onMount();
         // 1. create this component's DOM tree.
         this._root = this.render();
         // 2. do steps 1-3 for all children.
         this._children.forEach(c => c._mount());
         // 3. mount the node.
+        if (this.onMount) this.onMount();
         if (this._root) this._wrapper.appendChild(this._root);
     }
 
     _recursiveCleanup(): void {
         // 1. cleanup chlidren.
         this._children.forEach(c => c._recursiveCleanup());
-        this._children = [];
+        this._children = undefined;
         // 2. cleanup self.
         if (this.onUnmount) this.onUnmount();
         this._reactives.forEach(r => r.delete());
-        this._reactives = [];
+        this._reactives = undefined;
     }
 
     _unmount(): void {

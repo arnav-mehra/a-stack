@@ -6,19 +6,19 @@ const {
 class Index extends ServerComponent {
     constructor() {
         super();
-        this.title = "Hi Page";
+        this.title = "A-Stack";
         this.styleSheets = [
-            'main.css',
-            'bootstrap.min.css',
-            'currentStyle.css'
+            "currentStyle.css"
         ];
     }
-    
+
     render() { 
         return (
-            ClientEntry("Hello")
-        ) 
+            ClientEntry("Hello", {
+                class: "container"
+            })
+        );
     }
-}
+};
 
 module.exports = Index;

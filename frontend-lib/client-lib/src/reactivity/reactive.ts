@@ -61,10 +61,6 @@ export default class ReactiveObject {
     delete() {
         this.deps.forEach(d => d.removeReactive(this));
         this.deps = undefined;
-
-        this.reactives.forEach(r => r.delete());
-        this.reactives = undefined;
-        this.value = undefined;
     }
 
     removeReactive(r: ReactiveObject) {

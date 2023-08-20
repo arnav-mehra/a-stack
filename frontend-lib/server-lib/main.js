@@ -12,7 +12,7 @@ server.listen(
     HOST,
     async () => {
         loadPages();
-        console.log(Object.keys(PAGES));
+        // console.log(Object.keys(PAGES));
         console.log("listening...");
     }
 );
