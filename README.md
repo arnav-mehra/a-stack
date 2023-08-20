@@ -19,13 +19,13 @@ Notes:
 ### Performance: Duration in milliseconds ± 95% confidence interval (Slowdown = Duration / Fastest)
 
 <p align="center">
-  <img src="benchmark-results/a-stack-js-mem.PNG" />
+  <img src="benchmark-results/a-stack-js-perf.PNG" />
 </p>
 
 ### Memory Usage: Memory allocation in MBs ± 95% confidence interval
 
 <p align="center">
-  <img src="benchmark-results/a-stack-js-perf.PNG" />
+  <img src="benchmark-results/a-stack-js-mem.PNG" />
 </p>
 
 Overall, I am quite happy with the performance. I did not expect to be beating Svelte and matching vanilla JS in performance, but even after multiple re-runs, the results remained the same. Memory usage is not quite at the same level, however, I do not seem to be too far off the mark from Svelte or Vue.
@@ -44,7 +44,7 @@ To run:
 
 Continue to replicate js-framework-benchmark tests:
 
-1. Clone and follow the README of https://github.com/krausest/js-framework-benchmark. (Make sure to use Chrome v116 rather than 100)
+1. Clone and follow the README of https://github.com/krausest/js-framework-benchmark. (Make sure to use Chrome v116 rather than v100)
 2. Copy our folder /benchmark-results/a-stack/
     Note: This is a slight modification of frontend-lib/playground/dist/
 3. Paste the folder into krausest's frameworks/non-keyed/
