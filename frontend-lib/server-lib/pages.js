@@ -9,6 +9,7 @@ const DIST_FOLDER = 'dist\\';
 const SRC_FOLDER = 'src\\';
 
 const PAGES = {};
+const PRINT_ERR = false;
 
 const loadPages = (dir = PLAYGROUND_FOLDER + SRC_FOLDER) => {
     fs.readdirSync(dir).forEach(fname => {
@@ -45,7 +46,7 @@ const loadOtherFile = (path) => {
     console.log("copy:\t", SRC_FOLDER + origin, "\t=>", DIST_FOLDER + target);
     exec(
         `cd ${PLAYGROUND_FOLDER} && copy ${SRC_FOLDER + origin} ${DIST_FOLDER + target}`,
-        () => {} // (err, stdout, stderr) => { console.log({err, stdout, stderr}) }
+        (err, stdout, stderr) => { if (PRINT_ERR) console.log({err, stdout, stderr}); }
     );
 
     const content = fs.readFileSync(PLAYGROUND_FOLDER + SRC_FOLDER + target).toString();
