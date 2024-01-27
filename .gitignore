@@ -1,3 +1,4 @@
 node_modules
 build
 debug
+dsl/target/.rustc_info.json

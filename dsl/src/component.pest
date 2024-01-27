@@ -1,29 +1,25 @@
 WHITESPACE = _{ " " | NEWLINE }
 
-NO_QUOTE_CURLY = @{ " " | "!" | ('#'..'z') | "|" | "~" | NEWLINE }
-NO_QUOTE = @{ NO_QUOTE_CURLY | "{" | "}" }
+NO_QUOTE_BC = @{ " " | "!" | ('#'..'&') | ('('..'Z') | "\\" | "^" | "_" | ('a'..'z') | "|" | "~" | NEWLINE }
+NO_QUOTE    = @{ NO_QUOTE_BC | "{" | "}" | "[" | "]" }
 
-JS_STRING = @{ "\"" ~ NO_QUOTE ~ "\"" }
-JS_STRINGLESS = @{ NO_QUOTE_CURLY* }
-JS_BLOCKLESS = @{ JS_STRINGLESS ~ (JS_STRING ~ JS_STRINGLESS)* }
+JS_STRING     = @{ ("\"" ~ NO_QUOTE* ~ "\"") | ("'" ~ NO_QUOTE* ~ "'") | ("`" ~ NO_QUOTE* ~ "`") }
+JS_STRINGLESS = @{ NO_QUOTE_BC* }
 
-JS_BLOCKINNER = @{ JS_BLOCKLESS ~ ("{" ~ JS_BLOCKINNER ~ "}" ~ JS_BLOCKLESS)* }
-JS_BLOCK = { "{" ~ JS_BLOCKINNER ~ "}" }
+JS_BLOCKLESS  = @{ JS_STRINGLESS ~ (JS_STRING ~ JS_STRINGLESS)* }
+JS_BLOCKINNER = @{ JS_BLOCKLESS ~ (JS_BLOCK ~ JS_BLOCKLESS)* }
+JS_BLOCK      = @{ ("{" ~ JS_BLOCKINNER ~ "}") | ("[" ~ JS_BLOCKINNER ~ "]") }
 
-//JS_LINE = @{ ("\t" | " ") ~ (ASCII_ALPHA | " ")* ~ NEWLINE }
-//JS = ${ JS_LINE* }
-SCRIPT_EL = ${ "script" ~ WHITESPACE* ~ "[" ~ JS_BLOCKINNER ~ "]" }
-
-TEXT = @{ "`" ~ ((' '..'_') | ('a'..'~'))* ~ "`" }
-TEXT_EL = @{ TEXT | JS_BLOCK }
-
-TAG = @{ (ASCII_ALPHA_UPPER ~ ASCII_ALPHA*) | (ASCII_ALPHA_LOWER+) }
-ATTR_KEY = @{ ASCII_ALPHANUMERIC* }
-ATTR_VALUE = @{ (' '..'~')* }
-ATTR = { ATTR_KEY ~ "=" ~ ATTR_VALUE }
-HTML_EL = { TAG ~ ATTR* ~ ("[" ~ (HTML_EL | TEXT_EL)* ~ "]")* }
-
-PROP = @{ ASCII_ALPHA ~ ASCII_ALPHANUMERIC* }
+PROP    = @{ ASCII_ALPHA ~ ASCII_ALPHANUMERIC* }
 PROP_EL = { "props" ~ "[" ~ PROP* ~ "]" }
+
+TEXT_EL   = @{ JS_STRING | JS_BLOCK }
+SCRIPT_EL = { "script" ~ WHITESPACE* ~ JS_BLOCK }
+
+TAG        = @{ ASCII_ALPHA_LOWER+ }
+ATTR_KEY   = @{ (ASCII_ALPHANUMERIC | "-")* }
+ATTR_VALUE = @{ JS_STRING | JS_BLOCK }
+ATTR       = { ATTR_KEY ~ "=" ~ ATTR_VALUE }
+HTML_EL    = { TAG ~ ATTR* ~ ("[" ~ (HTML_EL | TEXT_EL)* ~ "]")* }
 
 COMPONENT = { PROP_EL ~ SCRIPT_EL ~ HTML_EL }
