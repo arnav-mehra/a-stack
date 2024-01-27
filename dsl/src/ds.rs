@@ -1,5 +1,6 @@
 #[derive(Debug)]
 pub struct Component {
+    pub name: String,
     pub props: Vec<String>,
     pub script: String,
     pub root: Element
@@ -8,10 +9,32 @@ pub struct Component {
 impl Component {
     pub fn new() -> Self {
         Self {
-            props: vec![],
-            script: "".to_string(),
+            name: String::new(),
+            props: Vec::new(),
+            script: String::new(),
             root: Element::new()
         }
+    }
+
+    pub fn serialize(self) -> String {
+        format!(
+            "
+                export class {} extends Component {{
+                    constructor(props) {{
+                        super(props);
+                        {}
+                    }}
+                    render() {{
+                        return (
+                            {}
+                        )
+                    }}
+                }}
+            ",
+            self.name,
+            "",
+            ""
+        )
     }
 }
 
@@ -25,9 +48,24 @@ pub struct Element {
 impl Element {
     pub fn new() -> Self {
         Self {
-            tag: "".to_string(),
-            attrs: vec![],
-            children: vec![]
+            tag: String::new(),
+            attrs: Vec::new(),
+            children: Vec::new()
         }
+    }
+
+    pub fn serialize(self) -> String {
+        // let children = self.children.map(|c|)
+
+        format!(
+            "
+                this.Element(\"{}\", {{{}}}, [
+                    {}
+                ])
+            ",
+            self.tag,
+            "",
+            ""
+        )
     }
 }

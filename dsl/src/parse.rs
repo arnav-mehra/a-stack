@@ -9,9 +9,8 @@ pub struct ComponentParser;
 
 pub static mut COMPS: Vec<Component> = vec![];
 
-pub fn get_component(c: Pair<'_, Rule>) {
+pub fn get_component(c: Pair<'_, Rule>) -> Component {
     let mut cp: Component = Component::new();
-
     for e in c.into_inner() {
         match e.as_rule() {
             Rule::HTML_EL => cp.root = get_element(e),
@@ -20,10 +19,7 @@ pub fn get_component(c: Pair<'_, Rule>) {
             _ => {}
         }
     }
-
-    unsafe {
-        COMPS.push(cp);
-    }
+    cp
 }
 
 fn get_props(e: Pair<'_, Rule>) -> Vec<String> {
@@ -50,7 +46,10 @@ fn get_element(e: Pair<'_, Rule>) -> Element {
                 el.tag = p.as_str().to_string();
             }
             Rule::ATTR => {
-                let v: Vec<String> = p.into_inner().map(|x| x.as_str().to_string()).collect();
+                let v: Vec<&str> = p
+                    .into_inner()
+                    .map(|x| x.as_str())
+                    .collect();
                 el.attrs.push((
                     v[0].to_string(),
                     v[1].to_string()

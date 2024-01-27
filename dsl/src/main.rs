@@ -2,11 +2,12 @@ use pest::Parser;
 use std::{fs};
 
 mod ds;
+use ds::{Component};
 mod parse;
 use parse::{COMPS, get_component, ComponentParser, Rule};
 
-fn main() {
-    let str: String = fs::read_to_string("Test.jsq")
+fn read_file(path: &str) {
+    let str: String = fs::read_to_string(path)
         .unwrap()
         .parse()
         .unwrap();
@@ -18,10 +19,11 @@ fn main() {
         .unwrap();
 
     for c in res.into_iter() {
-        get_component(c)
+        let cp: Component = get_component(c);
+        println!("{:?}", cp.serialize());
     }
+}
 
-    unsafe {
-        println!("{:?}", COMPS);
-    }
+fn main() {
+    read_file("Test.jsq");
 }
