@@ -7,10 +7,13 @@ use crate::ds::{Component, Element};
 #[grammar = "component.pest"]
 pub struct ComponentParser;
 
-pub static mut COMPS: Vec<Component> = vec![];
-
-pub fn get_component(c: Pair<'_, Rule>) -> Component {
+pub fn get_component(c: Pair<'_, Rule>, name: &str) -> Component {
     let mut cp: Component = Component::new();
+    cp.name = name
+        .to_string()
+        .chars()
+        .take_while(|p| *p != '.')
+        .collect();
     for e in c.into_inner() {
         match e.as_rule() {
             Rule::HTML_EL => cp.root = get_element(e),
@@ -59,7 +62,9 @@ fn get_element(e: Pair<'_, Rule>) -> Element {
                 let child: Element = get_element(p);
                 el.children.push(child);
             }
-            _ => {}
+            _ => {
+                println!("pp: {p}");
+            }
         }
     }
 

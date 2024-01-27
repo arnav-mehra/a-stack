@@ -8,7 +8,7 @@ script [
 ]
 
 div
-    onclick=this.bind.ez
+    onclick={this.bind.ez}
     class="flex"
 [
     div []

@@ -16,24 +16,22 @@ impl Component {
         }
     }
 
-    pub fn serialize(self) -> String {
+    pub fn serialize(&self) -> String {
         format!(
-            "
-                export class {} extends Component {{
-                    constructor(props) {{
-                        super(props);
-                        {}
-                    }}
-                    render() {{
-                        return (
-                            {}
-                        )
-                    }}
+            "export class {} extends Component {{
+                constructor(props) {{
+                    super(props);
+                    {}
                 }}
-            ",
+                render() {{
+                    return (
+                        {}
+                    )
+                }}
+            }}",
             self.name,
-            "",
-            ""
+            self.script,
+            self.root.serialize()
         )
     }
 }
@@ -54,18 +52,28 @@ impl Element {
         }
     }
 
-    pub fn serialize(self) -> String {
-        // let children = self.children.map(|c|)
+    pub fn serialize(&self) -> String {
+        let children: Vec<String> = self.children
+            .iter()
+            .map(|c| c.serialize())
+            .collect();
+        let children_str: String = children.join(",\n");
+
+        let attrs: Vec<String> = self.attrs
+            .iter()
+            .map(|(k, v)| "\"".to_owned() + k + "\"" + ": " + v)
+            .collect();
+        let attr_str: String = attrs.join(",\n");
 
         format!(
-            "
-                this.Element(\"{}\", {{{}}}, [
-                    {}
-                ])
-            ",
+            "this.Element(\"{}\", {{
+                {}
+            }}, [
+                {}
+            ])",
             self.tag,
-            "",
-            ""
+            attr_str,
+            children_str
         )
     }
 }
