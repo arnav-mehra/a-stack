@@ -1,0 +1,16 @@
+WHITESPACE = _{ " " | NEWLINE }
+
+TAG = @{ (ASCII_ALPHA_UPPER ~ ASCII_ALPHA*) | (ASCII_ALPHA_LOWER+) }
+ATTR_KEY = @{ ASCII_ALPHANUMERIC* }
+ATTR_VALUE = @{ (' '..'~')* }
+ATTR = { ATTR_KEY ~ "=" ~ ATTR_VALUE }
+HTML_EL = { TAG ~ ATTR* ~ ("[" ~ HTML_EL* ~ "]")* }
+
+PROP = @{ ASCII_ALPHA ~ ASCII_ALPHANUMERIC* }
+PROP_EL = { "props" ~ "[" ~ PROP* ~ "]" }
+
+JS_LINE = @{ ("\t" | " ") ~ (ASCII_ALPHA | " ")* ~ NEWLINE }
+JS = ${ JS_LINE* }
+SCRIPT_EL = ${ "script" ~ WHITESPACE* ~ "[" ~ NEWLINE* ~ JS ~ "]" }
+
+COMPONENT = { PROP_EL ~ SCRIPT_EL ~ HTML_EL }

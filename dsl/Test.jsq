@@ -1,0 +1,16 @@
+props [
+    prop1
+    prop2
+]
+
+script [
+    hi
+]
+
+div
+    onclick=this.bind.ez
+    class="flex"
+[
+    div []
+    div []
+]
