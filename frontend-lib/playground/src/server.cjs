@@ -7,9 +7,6 @@ class Index extends ServerComponent {
     constructor() {
         super();
         this.title = "A-Stack";
-        this.styleSheets = [
-            "currentStyle.css"
-        ];
     }
 
     render() { 
