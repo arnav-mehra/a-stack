@@ -1,45 +1,24 @@
-use pest::Parser;
-use std::{fs, path};
-use fs::{ReadDir};
-use path::{Path, PathBuf};
+#![feature(path_file_prefix)]
 
+mod stringify;
 mod ds;
-use ds::{Component};
 mod parse;
-use parse::{get_component, ComponentParser, Rule};
-
-fn read_file(path: &Path, name: &str) {
-    let str: String = fs::read_to_string(path)
-        .unwrap()
-        .parse()
-        .unwrap();
-
-    let p: Vec<char> = str.chars().collect();
-    println!("{:?}", p);
-
-    let res  = ComponentParser::parse(Rule::COMPONENT, &str)
-        .unwrap();
-
-    for c in res.into_iter() {
-        let cp: Component = get_component(c, name);
-        let res: String = cp.serialize();
-        println!("{res}");
-    }
-}
-
-fn iter_folder(dir: &Path) {
-    for ent in fs::read_dir(dir).unwrap() {
-        let path: PathBuf = ent.unwrap().path();
-        if path.is_dir() {
-            iter_folder(&path);
-        } else {
-            let prefix: String = dir.to_str().unwrap().to_owned() + "\\";
-            let name: &str = path.to_str().unwrap().strip_prefix(&prefix).unwrap();
-            read_file(&path, name);
-        }
-    }
-}
+mod file_io;
+use file_io::iter_folder;
+use std::path::Path;
 
 fn main() {
-    iter_folder(Path::new("./test"));
+    let in_root: &Path = Path::new("./test");
+    let out_root: &Path = Path::new("./build"); 
+    iter_folder(out_root, in_root, in_root);
+
+    // format!(
+    //     "import {{
+    //         Component, hydrate
+    //     }} from '../../client-lib/dist/bundle';
+    //     {}
+    //     hydrate();
+    //     ",
+    //     0
+    // );
 }

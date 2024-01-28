@@ -8,17 +8,17 @@ JS_STRINGLESS = @{ NO_QUOTE_BC* }
 
 JS_BLOCKLESS  = @{ JS_STRINGLESS ~ (JS_STRING ~ JS_STRINGLESS)* }
 JS_BLOCKINNER = @{ JS_BLOCKLESS ~ (JS_BLOCK ~ JS_BLOCKLESS)* }
-JS_BLOCK      = @{ ("{" ~ JS_BLOCKINNER ~ "}") | ("[" ~ JS_BLOCKINNER ~ "]") }
+JS_BLOCK      = ${ ("{" ~ JS_BLOCKINNER ~ "}") | ("[" ~ JS_BLOCKINNER ~ "]") }
 
 PROP    = @{ ASCII_ALPHA ~ ASCII_ALPHANUMERIC* }
 PROP_EL = { "props" ~ "[" ~ PROP* ~ "]" }
 
-TEXT_EL   = @{ JS_STRING | JS_BLOCK }
+TEXT_EL   = ${ JS_STRING | JS_BLOCK }
 SCRIPT_EL = { "script" ~ WHITESPACE* ~ JS_BLOCK }
 
 TAG        = @{ ASCII_ALPHA_LOWER+ }
 ATTR_KEY   = @{ (ASCII_ALPHANUMERIC | "-")* }
-ATTR_VALUE = @{ JS_STRING | JS_BLOCK }
+ATTR_VALUE = ${ JS_STRING | JS_BLOCK }
 ATTR       = { ATTR_KEY ~ "=" ~ ATTR_VALUE }
 HTML_EL    = { TAG ~ ATTR* ~ ("[" ~ (HTML_EL | TEXT_EL)* ~ "]")* }
 

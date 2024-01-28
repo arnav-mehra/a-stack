@@ -11,6 +11,8 @@ div
     onclick={this.bind.ez}
     class="flex"
 [
-    div []
+    div [
+        {hi}
+    ]
     div []
 ]

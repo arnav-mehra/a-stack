@@ -6,6 +6,25 @@ pub struct Component {
     pub root: Element
 }
 
+#[derive(Debug)]
+pub enum Node {
+    Element(Element),
+    Text(Text),
+    None()
+}
+
+#[derive(Debug)]
+pub struct Element {
+    pub tag: String,
+    pub attrs: Vec<(String, String)>,
+    pub children: Vec<Node>
+}
+
+#[derive(Debug)]
+pub struct Text {
+    pub msg: String
+}
+
 impl Component {
     pub fn new() -> Self {
         Self {
@@ -15,32 +34,16 @@ impl Component {
             root: Element::new()
         }
     }
-
-    pub fn serialize(&self) -> String {
-        format!(
-            "export class {} extends Component {{
-                constructor(props) {{
-                    super(props);
-                    {}
-                }}
-                render() {{
-                    return (
-                        {}
-                    )
-                }}
-            }}",
-            self.name,
-            self.script,
-            self.root.serialize()
-        )
-    }
 }
 
-#[derive(Debug)]
-pub struct Element {
-    pub tag: String,
-    pub attrs: Vec<(String, String)>,
-    pub children: Vec<Element>
+impl Node {
+    pub fn new() -> Self {
+        Self::None()
+    }
+
+    pub fn with_txt(t: &str) -> Self {
+        Self::Text(Text::new(t))
+    }
 }
 
 impl Element {
@@ -51,29 +54,12 @@ impl Element {
             children: Vec::new()
         }
     }
+}
 
-    pub fn serialize(&self) -> String {
-        let children: Vec<String> = self.children
-            .iter()
-            .map(|c| c.serialize())
-            .collect();
-        let children_str: String = children.join(",\n");
-
-        let attrs: Vec<String> = self.attrs
-            .iter()
-            .map(|(k, v)| "\"".to_owned() + k + "\"" + ": " + v)
-            .collect();
-        let attr_str: String = attrs.join(",\n");
-
-        format!(
-            "this.Element(\"{}\", {{
-                {}
-            }}, [
-                {}
-            ])",
-            self.tag,
-            attr_str,
-            children_str
-        )
+impl Text {
+    pub fn new(m: &str) -> Self {
+        Self {
+            msg: m.to_string()
+        }
     }
 }

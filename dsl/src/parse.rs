@@ -1,7 +1,7 @@
 use pest_derive::Parser;
 use pest::iterators::Pair;
 
-use crate::ds::{Component, Element};
+use crate::ds::{Component, Element, Node};
 
 #[derive(Parser)]
 #[grammar = "component.pest"]
@@ -32,39 +32,80 @@ fn get_props(e: Pair<'_, Rule>) -> Vec<String> {
 }
 
 fn get_script(e: Pair<'_, Rule>) -> String {
-    let mut s = "".to_string();
+    let mut s = String::new();
     for p in e.into_inner() {
-        s += p.as_str();
+        let n = get_text_node(p);
+        s += &match n {
+            Node::Text(txt) => txt.msg.clone(),
+            _ => String::new()
+        }
     }
     s
 }
 
+fn get_text_node(e: Pair<'_, Rule>) -> Node {
+    match e.as_rule() {
+        Rule::JS_STRING => {
+            Node::with_txt(e.as_str())
+        }
+        Rule::JS_BLOCK => {
+            Node::with_txt(
+                e.clone()
+                    .into_inner()
+                    .map(|w| w.as_str())
+                    .collect::<Vec<&str>>()
+                    .first()
+                    .unwrap()
+            )
+        }
+        _ => Node::new()
+    }
+}
+
 fn get_element(e: Pair<'_, Rule>) -> Element {
     let mut el: Element = Element::new();
-    
+
     for p in e.into_inner() {
-        println!("p: {:?}", p.as_str());
         match p.as_rule() {
             Rule::TAG => {
                 el.tag = p.as_str().to_string();
             }
             Rule::ATTR => {
-                let v: Vec<&str> = p
+                let k = p
+                    .clone()
                     .into_inner()
-                    .map(|x| x.as_str())
-                    .collect();
-                el.attrs.push((
-                    v[0].to_string(),
-                    v[1].to_string()
-                ))
+                    .rev()
+                    .last()
+                    .unwrap()
+                    .as_str()
+                    .to_string();
+                
+                let v = p
+                    .clone()
+                    .into_inner()
+                    .last()
+                    .unwrap()
+                    .into_inner()
+                    .last()
+                    .unwrap();
+
+                let v_str: String = match get_text_node(v) {
+                    Node::Text(v_txt) => v_txt.msg,
+                    _ => String::new()
+                };
+                el.attrs.push((k, v_str))
             }
             Rule::HTML_EL => {
-                let child: Element = get_element(p);
+                let child: Node = Node::Element(get_element(p));
                 el.children.push(child);
             }
-            _ => {
-                println!("pp: {p}");
+            Rule::TEXT_EL => {
+                for x in p.into_inner() {
+                    let child: Node = get_text_node(x);
+                    el.children.push(child);
+                }
             }
+            _ => {}
         }
     }
 
