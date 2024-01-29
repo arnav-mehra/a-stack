@@ -58,5 +58,3 @@ export class Hello extends Component {
         )
     }
 }
-
-hydrate();

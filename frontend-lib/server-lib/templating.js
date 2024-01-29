@@ -62,6 +62,10 @@ class ServerComponent {
     <body id="main">
         ${body}
     </body>
+    <script>
+        import { hydrate } from "bundle.js";
+        hydrate();
+    </script>
 </html>`
         );
     }

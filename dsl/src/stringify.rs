@@ -1,4 +1,4 @@
-use crate::ds::{Component, Element, Node, Text};
+use crate::ds::{Component, Element, Node, Text, Target};
 
 pub trait Stringify {
     fn stringify(&self) -> String;
@@ -6,26 +6,58 @@ pub trait Stringify {
 
 impl Stringify for Component {
     fn stringify(&self) -> String {
-        format!(
-            "
-            {}
-
-            export class {} extends Component {{
-                constructor(props) {{
-                    super(props);
+        match self.target {
+            Target::CLIENT => {
+                format!(
+                    "import {{ Component }} from 'client-lib';
                     {}
-                }}
-                render() {{
-                    return (
-                        {}
-                    )
-                }}
-            }}",
-            self.imports.join("\n"),
-            self.name,
-            self.script,
-            self.root.stringify()
-        )
+        
+                    export class {} extends Component {{
+                        constructor(props) {{
+                            super(props);
+                            {}
+                        }}
+                        render() {{
+                            return (
+                                {}
+                            )
+                        }}
+                    }}
+                    
+                    {}",
+                    self.imports.join("\n"),
+                    self.name,
+                    self.script,
+                    self.root.stringify(),
+                    if self.name == "client" { "hydrate();" } else { "" }
+                )
+            },
+            Target::SERVER => {
+                format!(
+                    "const {{ ServerComponent }} = require('server-lib/templating');
+                    {}
+        
+                    class {} extends ServerComponent {{
+                        constructor(props) {{
+                            super(props);
+                            {}
+                        }}
+                        render() {{
+                            return (
+                                {}
+                            )
+                        }}
+                    }}
+                    
+                    module.exports = {};",
+                    self.imports.join("\n"),
+                    self.name,
+                    self.script,
+                    self.root.stringify(),
+                    self.name
+                )
+            }
+        }
     }
 }
 
@@ -97,7 +129,6 @@ impl Stringify for Element {
             }
             Some(component) => {
                 let mut wrapper_attrs = self.attrs.clone();
-                // let var = wrapper_attrs.remove("var").unwrap();
                 let props = match wrapper_attrs.remove("props") {
                     Some(x) => x,
                     None => String::from("{}")
@@ -144,7 +175,6 @@ impl Stringify for Element {
                     children_str
                 )
             }
-            _ => String::new()
         }
     }
 }

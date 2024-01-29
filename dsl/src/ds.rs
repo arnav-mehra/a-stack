@@ -1,7 +1,16 @@
 use std::collections::HashMap;
+use std::path::PathBuf;
+
+#[derive(Debug, Copy, Clone)]
+pub enum Target {
+    CLIENT,
+    SERVER
+}
 
 #[derive(Debug)]
 pub struct Component {
+    pub target: Target,
+    pub path: PathBuf,
     pub name: String,
     pub props: Vec<String>,
     pub script: String,
@@ -29,9 +38,27 @@ pub struct Text {
 }
 
 impl Component {
-    pub fn new() -> Self {
+    pub fn new(path: &PathBuf) -> Self {
+        let ext = path.file_stem().unwrap().to_str().unwrap();
+        let fname = path.file_prefix().unwrap().to_str().unwrap();
+        let dname = path.parent().unwrap().file_name().unwrap().to_str().unwrap();
+        
+        let target = match ext {
+            "jsc" => Target::CLIENT,
+            "jss" | _ => Target::SERVER
+        };
+        let raw_name = match fname {
+            "client" | "server" => dname,
+            s => s 
+        };
+        let name: String = raw_name.chars().next().unwrap().to_uppercase().chain(raw_name.chars().skip(1)).collect();
+        println!("name {name}");
+
         Self {
-            name: String::new(),
+            name,
+            target,
+            path: path.clone(),
+
             props: Vec::new(),
             script: String::new(),
             root: Element::new(),

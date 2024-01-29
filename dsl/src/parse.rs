@@ -1,24 +1,20 @@
 use pest_derive::Parser;
 use pest::iterators::Pair;
+use std::path::PathBuf;
 
-use crate::ds::{Component, Element, Node};
+use crate::ds::{Component, Element, Node, Target};
 
 #[derive(Parser)]
 #[grammar = "component.pest"]
 pub struct ComponentParser;
 
-pub fn get_component(c: Pair<'_, Rule>, name: &str) -> Component {
-    let mut cp: Component = Component::new();
-    cp.name = name
-        .to_string()
-        .chars()
-        .take_while(|p| *p != '.')
-        .collect();
-    for e in c.into_inner() {
+pub fn get_component(parse_tree: Pair<'_, Rule>, path: &PathBuf) -> Component {
+    let mut cp: Component = Component::new(path);
+    for e in parse_tree.into_inner() {
         match e.as_rule() {
             Rule::HTML_EL => cp.root = get_element(e),
             Rule::PROP_EL => cp.props = get_props(e),
-            Rule::IMPORT_EL => cp.imports = get_imports(e),
+            Rule::IMPORT_EL => cp.imports = get_imports(e, cp.target),
             Rule::SCRIPT_EL => cp.script = get_script(e),
             _ => {}
         }
@@ -32,13 +28,23 @@ fn get_props(e: Pair<'_, Rule>) -> Vec<String> {
         .collect()
 }
 
-fn get_imports(e: Pair<'_, Rule>) -> Vec<String> {
+fn get_imports(e: Pair<'_, Rule>, target: Target) -> Vec<String> {
     let script: String = get_script(e);
     let imps = script.split(";");
     let cnt = imps.clone().count() - 1;
-    imps.take(cnt)
-        .map(|p| "import ".to_owned() + p)
-        .collect()
+
+    match target {
+        Target::CLIENT => {
+            imps.take(cnt)
+                .map(|p| "import ".to_owned() + p)
+                .collect()
+        }
+        Target::SERVER => {
+            imps.take(cnt)
+                .map(|p| "const ".to_owned() + p)
+                .collect()
+        }
+    }
 }
 
 fn get_script(e: Pair<'_, Rule>) -> String {
