@@ -5,27 +5,25 @@ import {
 export class Hello extends Component {
     constructor(props) {
         super(props);
-        
-        this.State({
-            id: 1,
-            backup: null,
-            start: 0,
-            d: {
-                arr: ["hi"],
-                selected: null
-            }
-        });
+
+        this.id = this.State(1);
+        this.backup = this.State(null);
+        this.start = this.State(0);
+        this.d = this.State({
+            arr: ["hi"],
+            selected: null
+        })
     }
 
     pushEl() {
-        this.state.d.setState(a => {
+        this.d.setState(a => {
             a.arr.push("hi")
             return a
         })
     }
 
     popEl() {
-        this.state.d.setState(a => {
+        this.d.setState(a => {
             a.arr.pop()
             return a
         })
@@ -46,9 +44,9 @@ export class Hello extends Component {
                 ]),
                 this.Mapper(
                     this.Element("div"),
-                    this.Reactive(d => d.arr, [ this.state.d ]),
+                    this.Reactive(d => d.arr, [ this.d ]),
                     function(i) {
-                        const textReactive = this.Reactive(d => d.arr[i], [ this.state.d ]);
+                        const textReactive = this.Reactive(d => d.arr[i], [ this.d ]);
                         return (
                             this.Element("div", {}, [
                                 this.Text(textReactive)

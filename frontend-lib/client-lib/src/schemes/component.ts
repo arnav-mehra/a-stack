@@ -35,9 +35,7 @@ export default class Component {
         wrapper: HTMLElement = Element(), // component wrapper (components aren't fragments)
         props:   Object      = {}         // props passed down to component
     ) {
-        this.props = props;
-        this.state = {};
-        
+        this.props = props;        
         this._wrapper = wrapper;
         this._reactives = [];
         this._children = [];
@@ -45,15 +43,8 @@ export default class Component {
 
     // USER METHODS
 
-    State(stateKeyVals: Object): void {
-        for (const [ key, initVal ] of Object.entries(stateKeyVals)) {
-            if (this.state[key]) {
-                console.error(`State key "${key}" already exists.`);
-                continue;
-            }
-            const state = new StateObject(initVal);
-            this.state[key] = state;
-        }
+    State(initVal: any): StateObject {
+        return new StateObject(initVal);
     }
 
     Reactive(

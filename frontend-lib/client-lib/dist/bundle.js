@@ -122,21 +122,13 @@ class Component {
     props = {} // props passed down to component
     ) {
         this.props = props;
-        this.state = {};
         this._wrapper = wrapper;
         this._reactives = [];
         this._children = [];
     }
     // USER METHODS
-    State(stateKeyVals) {
-        for (const [key, initVal] of Object.entries(stateKeyVals)) {
-            if (this.state[key]) {
-                console.error(`State key "${key}" already exists.`);
-                continue;
-            }
-            const state = new StateObject(initVal);
-            this.state[key] = state;
-        }
+    State(initVal) {
+        return new StateObject(initVal);
     }
     Reactive(cb, deps) {
         const reactive = new ReactiveObject(cb, deps);

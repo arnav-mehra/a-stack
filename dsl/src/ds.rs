@@ -1,9 +1,12 @@
+use std::collections::HashMap;
+
 #[derive(Debug)]
 pub struct Component {
     pub name: String,
     pub props: Vec<String>,
     pub script: String,
-    pub root: Element
+    pub root: Element,
+    pub imports: Vec<String>
 }
 
 #[derive(Debug)]
@@ -16,7 +19,7 @@ pub enum Node {
 #[derive(Debug)]
 pub struct Element {
     pub tag: String,
-    pub attrs: Vec<(String, String)>,
+    pub attrs: HashMap<String, String>,
     pub children: Vec<Node>
 }
 
@@ -31,7 +34,8 @@ impl Component {
             name: String::new(),
             props: Vec::new(),
             script: String::new(),
-            root: Element::new()
+            root: Element::new(),
+            imports: Vec::new()
         }
     }
 }
@@ -50,7 +54,7 @@ impl Element {
     pub fn new() -> Self {
         Self {
             tag: String::new(),
-            attrs: Vec::new(),
+            attrs: HashMap::new(),
             children: Vec::new()
         }
     }

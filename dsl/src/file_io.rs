@@ -11,12 +11,24 @@ pub fn read_file(path: &Path) -> String {
     let str: String = fs::read_to_string(path).unwrap().parse().unwrap();
 
     match ext {
-        "jsq" => {            
+        "jsq" => {       
+            let ch_cnt = str.chars()
+                .filter(|x| x.is_whitespace())
+                .count();
+            println!("JSQ char count (no whitespace): {}", ch_cnt);
+
             let res = ComponentParser::parse(Rule::COMPONENT, &str).unwrap();
             let c: Pair<'_, Rule> = res.into_iter().last().unwrap();
             let name: &str = path.file_prefix().unwrap().to_str().unwrap();
             let cp: Component = get_component(c, name);
-            cp.stringify()
+            let cp_str = cp.stringify();
+
+            let ch_cnt = cp_str.chars()
+                .filter(|x| x.is_whitespace())
+                .count();
+            println!("JS char count (no whitespace): {}", ch_cnt);
+
+            cp_str
         }
         _ => str
     }    

@@ -1,10 +1,10 @@
-props [
-    prop1
-    prop2
+imports [
+    {} from '';
 ]
 
 script [
-    hi
+    this.x = [S: 10];
+    this.v = [R: (this.x) => x];
 ]
 
 div
@@ -12,7 +12,26 @@ div
     class="flex"
 [
     div [
-        {hi}
+        {this.hi}
     ]
-    div []
+
+    div:map
+        arr={[R: (this.d) => d.arr]}
+        ctx={i => {
+            const textReactive = [R: (this.d) => d.arr[i]];
+        }}
+    [
+        div [
+            {textReactive}
+        ]
+    ]
+
+    div:this.hi
+    []
+
+    div:cond
+        if={[R: (this.d) => d.value == 5]}
+    [
+        "true"
+    ]
 ]
