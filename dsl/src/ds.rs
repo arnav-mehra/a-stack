@@ -3,8 +3,9 @@ use std::path::PathBuf;
 
 #[derive(Debug, Copy, Clone)]
 pub enum Target {
-    CLIENT,
-    SERVER
+    CLIENT_ROOT,
+    CLIENT_COMP,
+    SERVER,
 }
 
 #[derive(Debug)]
@@ -15,7 +16,8 @@ pub struct Component {
     pub props: Vec<String>,
     pub script: String,
     pub root: Element,
-    pub imports: Vec<String>
+    pub imports: Vec<String>,
+    pub exports: Vec<String>
 }
 
 #[derive(Debug)]
@@ -39,13 +41,15 @@ pub struct Text {
 
 impl Component {
     pub fn new(path: &PathBuf) -> Self {
-        let ext = path.file_stem().unwrap().to_str().unwrap();
+        let ext = path.extension().unwrap().to_str().unwrap();
         let fname = path.file_prefix().unwrap().to_str().unwrap();
         let dname = path.parent().unwrap().file_name().unwrap().to_str().unwrap();
         
-        let target = match ext {
-            "jsc" => Target::CLIENT,
-            "jss" | _ => Target::SERVER
+        println!("{ext} : {fname}");
+        let target = match (ext, fname) {
+            ("jsc", "client") => Target::CLIENT_ROOT,
+            ("jsc", _) => Target::CLIENT_COMP,
+            ("jss", _) | _ => Target::SERVER
         };
         let raw_name = match fname {
             "client" | "server" => dname,
@@ -62,7 +66,8 @@ impl Component {
             props: Vec::new(),
             script: String::new(),
             root: Element::new(),
-            imports: Vec::new()
+            imports: Vec::new(),
+            exports: Vec::new()
         }
     }
 }

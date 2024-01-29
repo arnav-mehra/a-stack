@@ -3,12 +3,20 @@
 const fs = require("fs");
 const path = require('path');
 const exec = require('child_process').exec;
+const mime = require('mime');
 
 const PLAYGROUND_FOLDER = 'playground\\';
 const DIST_FOLDER = 'dist\\';
 const SRC_FOLDER = 'src\\';
 
-const PAGES = {};
+const METHODS = {
+    GET: {},
+    POST: {},
+    PUT: {},
+    DELETE: {},
+    PATCH: {}
+};
+
 const PRINT_ERR = false;
 
 const loadPages = (dir = PLAYGROUND_FOLDER + SRC_FOLDER) => {
@@ -34,9 +42,12 @@ const loadPage = (rpath) => {
     loadOtherFile(rpath);
 };
 
-const addPage = (route, content) => {
+const addPage = (route, content, mime) => {
     route = route.replaceAll('\\', '/');
-    PAGES[route] = content;
+    METHODS.GET[route] = {
+        fn: () => content,
+        mime
+    };
 };
 
 const loadOtherFile = (path) => {
@@ -50,7 +61,7 @@ const loadOtherFile = (path) => {
     );
 
     const content = fs.readFileSync(PLAYGROUND_FOLDER + SRC_FOLDER + target).toString();
-    addPage(target, content);
+    addPage(target, content, mime.getType(target));
 };
 
 const loadClientJS = (path) => {
@@ -64,22 +75,23 @@ const loadClientJS = (path) => {
     );
 
     const content = fs.readFileSync(PLAYGROUND_FOLDER + DIST_FOLDER + target).toString();
-    addPage(target, content);
+    addPage(target, content, mime.getType(target));
 };
 
 const loadServerHTML = (path) => {
     const origin = path.replace(PLAYGROUND_FOLDER + SRC_FOLDER, "");
     const target = origin.replace("server.cjs", "index.html");
-
+    
     console.log("ssg:\t", SRC_FOLDER + origin, "\t=>", DIST_FOLDER + target);      
     const IndexComponent = require('..\\' + path);
     const content = new IndexComponent()._render();
     fs.writeFileSync(PLAYGROUND_FOLDER + DIST_FOLDER + target, content, console.log);
-
-    addPage(target, content);
+    
+    const route  = origin.replace("client.mjs", "");
+    addPage(route, content, mime.getType(target));
 };
 
 module.exports = {
-    PAGES,
+    METHODS,
     loadPages
 };

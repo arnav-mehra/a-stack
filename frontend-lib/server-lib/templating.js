@@ -1,20 +1,5 @@
 // HTML Templating/Generation
 
-const path = require("path");
-const fs = require("fs");
-
-function ClientEntry(
-    name,
-    props = {}
-) {
-    return (
-        `<component name=${name}`
-        + Object.entries(props)
-                .map(([key, value]) => ` ${key}=${value}`)
-        + `></component>`
-    );
-};
-
 class ServerComponent {
     constructor(props) {
         this.props = props;
@@ -72,6 +57,5 @@ class ServerComponent {
 };
 
 module.exports = {
-    ClientEntry,
     ServerComponent
 };

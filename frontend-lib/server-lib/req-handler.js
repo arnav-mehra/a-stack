@@ -1,9 +1,10 @@
-const { PAGES } = require('./pages');
+const { METHODS } = require('./pages');
 const mime = require('mime');
+const http = require("http");
 
 const patchRoute = (route) => {
-    if (!route.includes('.')) {
-        route += 'index.html';
+    if (!route) {
+        return route;
     }
     if (route[0] == '/') {
         route = route.substring(1);
@@ -11,20 +12,39 @@ const patchRoute = (route) => {
     return route;
 }
 
+/**
+ * @type {http.RequestListener}
+ * @param {typeof http.IncomingMessage}
+ * @param {typeof http.ServerResponse}
+*/
 const requestListener = function (req, res) {
-    const route = patchRoute(req.url);
+    const { url, method } = req;
+    const route = patchRoute(url);
     console.log(route)
-    
-    res.setHeader('Content-Type', mime.getType(route));
 
-    if (!PAGES[route]) {
+    if (!method || !METHODS[method]) {
+        res.writeHead(500);
+        res.end('<div>Unrecognized http method</div>');
+        return;
+    }
+    if (!METHODS[method][route]) {
         res.writeHead(404);
         res.end('<div>Page Not Found</div>');
         return;
     }
 
-    res.writeHead(200);
-    res.end(PAGES[route])
+    try {
+        const { fn, mime } = METHODS[method][route];
+        const data = fn(req, res);
+
+        if (!res.hasHeader("Content-Type")) {
+            res.setHeader('Content-Type', mime);
+        }
+        res.writeHead(200);
+        res.end(data);
+    } catch (err) {
+        console.error(err);
+    }
 };
 
 module.exports = {

@@ -15,6 +15,7 @@ pub fn get_component(parse_tree: Pair<'_, Rule>, path: &PathBuf) -> Component {
             Rule::HTML_EL => cp.root = get_element(e),
             Rule::PROP_EL => cp.props = get_props(e),
             Rule::IMPORT_EL => cp.imports = get_imports(e, cp.target),
+            Rule::EXPORT_EL => cp.exports = get_exports(e, cp.target),
             Rule::SCRIPT_EL => cp.script = get_script(e),
             _ => {}
         }
@@ -34,7 +35,7 @@ fn get_imports(e: Pair<'_, Rule>, target: Target) -> Vec<String> {
     let cnt = imps.clone().count() - 1;
 
     match target {
-        Target::CLIENT => {
+        Target::CLIENT_COMP => {
             imps.take(cnt)
                 .map(|p| "import ".to_owned() + p)
                 .collect()
@@ -44,6 +45,22 @@ fn get_imports(e: Pair<'_, Rule>, target: Target) -> Vec<String> {
                 .map(|p| "const ".to_owned() + p)
                 .collect()
         }
+        _ => vec![]
+    }
+}
+
+fn get_exports(e: Pair<'_, Rule>, target: Target) -> Vec<String> {
+    let script: String = get_script(e);
+    let imps = script.split(";");
+    let cnt = imps.clone().count() - 1;
+
+    match target {
+        Target::CLIENT_ROOT => {
+            imps.take(cnt)
+                .map(|p| "export ".to_owned() + p)
+                .collect()
+        }
+        _ => vec![]
     }
 }
 

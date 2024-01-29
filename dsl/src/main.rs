@@ -1,4 +1,5 @@
 #![feature(path_file_prefix)]
+#![allow(non_camel_case_types)]
 
 mod stringify;
 mod ds;

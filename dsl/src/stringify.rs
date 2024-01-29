@@ -7,12 +7,21 @@ pub trait Stringify {
 impl Stringify for Component {
     fn stringify(&self) -> String {
         match self.target {
-            Target::CLIENT => {
+            Target::CLIENT_ROOT => {
                 format!(
-                    "import {{ Component }} from 'client-lib';
+                    "import {{ hydrate }} from 'a-stack/client-lib';
+                    {}
+                    hydrate();
+                    ",
+                    self.exports.join("\n")
+                )
+            }
+            Target::CLIENT_COMP => {
+                format!(
+                    "import {{ Component }} from 'a-stack/client-lib';
                     {}
         
-                    export class {} extends Component {{
+                    export default class {} extends Component {{
                         constructor(props) {{
                             super(props);
                             {}
@@ -22,19 +31,16 @@ impl Stringify for Component {
                                 {}
                             )
                         }}
-                    }}
-                    
-                    {}",
+                    }}",
                     self.imports.join("\n"),
                     self.name,
                     self.script,
-                    self.root.stringify(),
-                    if self.name == "client" { "hydrate();" } else { "" }
+                    self.root.stringify()
                 )
             },
             Target::SERVER => {
                 format!(
-                    "const {{ ServerComponent }} = require('server-lib/templating');
+                    "const {{ ServerComponent }} = require('a-stack/server-lib/templating');
                     {}
         
                     class {} extends ServerComponent {{

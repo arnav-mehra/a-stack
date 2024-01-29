@@ -25,6 +25,7 @@ TEXT_EL   = ${ JS_STRING | BLOCK }
 SCRIPT_EL = { "script" ~ WHITESPACE* ~ BLOCK }
 
 IMPORT_EL = { "imports" ~ WHITESPACE* ~ BLOCK }
+EXPORT_EL = { "exports" ~ WHITESPACE* ~ BLOCK }
 
 TAG        = @{ (ASCII_ALPHA_LOWER | ":" | ".")+ }
 ATTR_KEY   = @{ (ASCII_ALPHANUMERIC | "-")* }
@@ -32,4 +33,4 @@ ATTR_VALUE = { JS_STRING | BLOCK }
 ATTR       = { ATTR_KEY ~ "=" ~ ATTR_VALUE }
 HTML_EL    = { TAG ~ ATTR* ~ ("[" ~ (HTML_EL | TEXT_EL)* ~ "]")* }
 
-COMPONENT = { IMPORT_EL? ~ PROP_EL? ~ SCRIPT_EL? ~ HTML_EL }
+COMPONENT = { EXPORT_EL | (IMPORT_EL? ~ PROP_EL? ~ SCRIPT_EL? ~ HTML_EL) }

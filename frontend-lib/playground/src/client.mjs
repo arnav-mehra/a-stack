@@ -2,7 +2,7 @@ import {
     Component, hydrate
 } from '../../client-lib/dist/bundle';
 
-export class Hello extends Component {
+export default class Hello extends Component {
     constructor(props) {
         super(props);
 
