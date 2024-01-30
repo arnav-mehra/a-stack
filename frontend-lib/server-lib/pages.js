@@ -45,7 +45,10 @@ const loadPage = (rpath) => {
 const addPage = (route, content, mime) => {
     route = route.replaceAll('\\', '/');
     METHODS.GET[route] = {
-        fn: () => content,
+        fn: () => ({
+            status: 200,
+            data: content
+        }),
         mime
     };
 };

@@ -35,12 +35,12 @@ const requestListener = function (req, res) {
 
     try {
         const { fn, mime } = METHODS[method][route];
-        const data = fn(req, res);
+        const { data, status } = fn(req, res);
 
         if (!res.hasHeader("Content-Type")) {
             res.setHeader('Content-Type', mime);
         }
-        res.writeHead(200);
+        res.writeHead(status);
         res.end(data);
     } catch (err) {
         console.error(err);
