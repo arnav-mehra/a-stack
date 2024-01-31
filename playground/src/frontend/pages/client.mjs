@@ -1,6 +1,6 @@
 import {
     Component, hydrate
-} from '../../client-lib/dist/bundle';
+} from 'a-stack-client';
 
 export default class Hello extends Component {
     constructor(props) {
@@ -58,3 +58,5 @@ export default class Hello extends Component {
         )
     }
 }
+
+hydrate();

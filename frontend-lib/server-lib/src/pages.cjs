@@ -5,10 +5,6 @@ const path = require('path');
 const exec = require('child_process').exec;
 const mime = require('mime');
 
-const PLAYGROUND_FOLDER = 'playground\\';
-const DIST_FOLDER = 'dist\\';
-const SRC_FOLDER = 'src\\';
-
 const METHODS = {
     GET: {},
     POST: {},
@@ -16,6 +12,10 @@ const METHODS = {
     DELETE: {},
     PATCH: {}
 };
+
+const PLAYGROUND_FOLDER = '..\\..\\';
+const DIST_FOLDER = 'dist\\';
+const SRC_FOLDER = 'src\\frontend\\pages\\';
 
 const PRINT_ERR = false;
 

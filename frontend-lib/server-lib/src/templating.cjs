@@ -1,6 +1,6 @@
 // HTML Templating/Generation
 
-class ServerComponent {
+class Component {
     constructor(props) {
         this.props = props;
     }
@@ -57,5 +57,5 @@ class ServerComponent {
 };
 
 module.exports = {
-    ServerComponent
+    Component
 };

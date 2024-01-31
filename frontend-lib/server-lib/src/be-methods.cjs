@@ -1,7 +1,6 @@
-const { METHODS } = require("./pages");
-const mime = require('mime');
+const { METHODS } = require("./pages.cjs");
 
-const loadUserMethods = (userMethods) => {
+const loadBackendMethods = (userMethods) => {
     for (const method of Object.keys(userMethods)) {
         const new_methods = userMethods[method];
         const old_methods = METHODS[method.toUpperCase()];
@@ -23,5 +22,5 @@ const loadUserMethods = (userMethods) => {
 };
 
 module.exports = {
-    loadUserMethods
+    loadBackendMethods
 };

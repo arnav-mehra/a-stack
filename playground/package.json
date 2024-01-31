@@ -1,0 +1,13 @@
+{
+  "name": "a-stack-example",
+  "version": "1.0.0",
+  "description": "an example app in a-stack",
+  "scripts": {
+    "play-once": "cd server-lib && node main.js",
+    "play": "nodemon --ext \"js,mjs,cjs,json\" --watch src ../frontend-lib/server-lib/main.js"
+  },
+  "author": {
+    "name": "arnav"
+  },
+  "license": "ISC"
+}
