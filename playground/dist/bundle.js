@@ -274,8 +274,7 @@ Component.prototype.Conditional = function (wrapper, reactive, trueRenderFunc) {
 class Hello extends Component {
                         constructor(props) {
                             super(props);
-                            this.title = "hi";
-
+                            
                         }
                         render() {
                             return (

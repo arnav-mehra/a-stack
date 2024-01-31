@@ -1,7 +1,3 @@
-script [
-    this.title = "hi";
-]
-
 div [
     "hello world"
 ]
