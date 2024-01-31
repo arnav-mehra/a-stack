@@ -14,7 +14,7 @@ const METHODS = {
 };
 
 const DIST_FOLDER = 'dist\\';
-const SRC_FOLDER = 'src\\frontend\\pages\\';
+const SRC_FOLDER = 'src\\frontend\\pages-build\\';
 
 const PRINT_ERR = true;
 
@@ -93,7 +93,7 @@ const loadServerHTML = (p) => {
     const content = new IndexComponent()._render();
     fs.writeFileSync(DIST_FOLDER + target, content, console.log);
     
-    const route  = origin.replace("client.mjs", "");
+    const route = origin.replace("server.cjs", "");
     addPage(route, content, mime.getType(target));
 };
 

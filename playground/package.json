@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "an example app in a-stack",
   "scripts": {
-    "dev-once": "cd server-lib && node main.js",
-    "dev": "nodemon --ext \"js,mjs,cjs,json\" --watch src src/backend/main.cjs"
+    "rebuild-dist": "node src/backend/main.cjs",
+    "rebuild-pages": "cargo run --manifest-path ../dsl/Cargo.toml -- src/frontend/pages src/frontend/pages-build",
+
+    "dev-dist": "nodemon --ext \"cjs,mjs\" --watch src --exec \"npm run rebuild-dist\"",
+    "dev-pages": "nodemon --ext \"jss,jsc\" --watch src/frontend/pages --exec \"npm run rebuild-pages && npm run rebuild-dist\""
   },
   "author": {
     "name": "arnav"

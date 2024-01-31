@@ -3,4 +3,7 @@ const { startServer } = require('a-stack-server');
 const backendMethods = {
 };
 
-startServer(backendMethods);
+startServer({
+    port: 8000,
+    backendMethods
+});

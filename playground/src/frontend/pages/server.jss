@@ -1,0 +1,5 @@
+component
+    name="Hello"
+[
+    
+]

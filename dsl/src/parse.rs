@@ -37,12 +37,12 @@ fn get_imports(e: Pair<'_, Rule>, target: Target) -> Vec<String> {
     match target {
         Target::CLIENT_COMP => {
             imps.take(cnt)
-                .map(|p| "import ".to_owned() + p)
+                .map(|p| "import ".to_owned() + &p.replace(".jsc", ".mjs"))
                 .collect()
         }
         Target::SERVER => {
             imps.take(cnt)
-                .map(|p| "const ".to_owned() + p)
+                .map(|p| "const ".to_owned() + &p.replace(".jss", ".cjs"))
                 .collect()
         }
         _ => vec![]
@@ -57,7 +57,7 @@ fn get_exports(e: Pair<'_, Rule>, target: Target) -> Vec<String> {
     match target {
         Target::CLIENT_ROOT => {
             imps.take(cnt)
-                .map(|p| "export ".to_owned() + p)
+                .map(|p| "export ".to_owned() + &p.replace(".jsc", ".mjs"))
                 .collect()
         }
         _ => vec![]

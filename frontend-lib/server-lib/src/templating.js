@@ -12,12 +12,12 @@ class Component {
     ) {
         let html = '<' + tag;
         for (const [ key, val ] of Object.entries(props)) {
-            html += ' ' + key + '=' + val;
+            html += ' ' + key + '=\"' + val + "\"";
         }
         html += '>';
 
         for (const ch of children) {
-            if (ch instanceof ServerComponent) {
+            if (ch instanceof Component) {
                 html += ch.render();
             }
             html += ch;

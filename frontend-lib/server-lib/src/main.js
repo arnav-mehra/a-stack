@@ -5,20 +5,19 @@ const { requestListener } = require('./req-handler.js');
 const { Component } = require("./templating.js");
 
 const HOST = 'localhost';
-const PORT = 8000;
 
 const server = http.createServer(requestListener);
 
-const startServer = (
-    backendRoutes = {}
-) => {
+const startServer = ({
+    port = 8000,
+    backendMethods = {}
+}) => {
     server.listen(
-        PORT,
+        port,
         HOST,
         async () => {
             loadPages();
-            loadBackendMethods(backendRoutes);
-            // console.log(Object.keys(PAGES));
+            loadBackendMethods(backendMethods);
             console.log("listening...");
         }
     );

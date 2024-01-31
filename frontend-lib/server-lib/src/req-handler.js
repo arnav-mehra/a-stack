@@ -20,14 +20,16 @@ const patchRoute = (route) => {
 const requestListener = function (req, res) {
     const { url, method } = req;
     const route = patchRoute(url);
-    console.log(route)
+    console.log("route: ", route);
 
     if (!method || !METHODS[method]) {
+        res.setHeader('Content-Type', "text/html");
         res.writeHead(500);
         res.end('<div>Unrecognized http method</div>');
         return;
     }
     if (!METHODS[method][route]) {
+        res.setHeader('Content-Type', "text/html");
         res.writeHead(404);
         res.end('<div>Page Not Found</div>');
         return;

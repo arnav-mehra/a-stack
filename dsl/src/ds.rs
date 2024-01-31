@@ -44,8 +44,8 @@ impl Component {
         let ext = path.extension().unwrap().to_str().unwrap();
         let fname = path.file_prefix().unwrap().to_str().unwrap();
         let dname = path.parent().unwrap().file_name().unwrap().to_str().unwrap();
-        
-        println!("{ext} : {fname}");
+
+        println!("{ext}: {fname}");
         let target = match (ext, fname) {
             ("jsc", "client") => Target::CLIENT_ROOT,
             ("jsc", _) => Target::CLIENT_COMP,
@@ -56,7 +56,6 @@ impl Component {
             s => s 
         };
         let name: String = raw_name.chars().next().unwrap().to_uppercase().chain(raw_name.chars().skip(1)).collect();
-        println!("name {name}");
 
         Self {
             name,
