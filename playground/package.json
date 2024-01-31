@@ -3,11 +3,17 @@
   "version": "1.0.0",
   "description": "an example app in a-stack",
   "scripts": {
-    "play-once": "cd server-lib && node main.js",
-    "play": "nodemon --ext \"js,mjs,cjs,json\" --watch src ../frontend-lib/server-lib/main.js"
+    "dev-once": "cd server-lib && node main.js",
+    "dev": "nodemon --ext \"js,mjs,cjs,json\" --watch src src/backend/main.cjs"
   },
   "author": {
     "name": "arnav"
   },
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "a-stack-client": "file:../frontend-lib/client-lib",
+    "a-stack-server": "file:../frontend-lib/server-lib",
+    "rollup": "^4.9.6"
+  }
 }

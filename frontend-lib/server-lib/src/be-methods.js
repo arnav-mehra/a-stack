@@ -1,4 +1,4 @@
-const { METHODS } = require("./pages.cjs");
+const { METHODS } = require("./pages.js");
 
 const loadBackendMethods = (userMethods) => {
     for (const method of Object.keys(userMethods)) {

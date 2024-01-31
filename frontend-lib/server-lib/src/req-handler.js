@@ -1,4 +1,4 @@
-const { METHODS } = require('./pages.cjs');
+const { METHODS } = require('./pages.js');
 const mime = require('mime');
 const http = require("http");
 

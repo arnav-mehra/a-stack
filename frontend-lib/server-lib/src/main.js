@@ -1,8 +1,8 @@
 const http = require("http");
-const { loadPages, METHODS } = require('./pages.cjs');
-const { loadBackendMethods } = require("./be-methods.cjs");  
-const { requestListener } = require('./req-handler');
-const { Component } = require("./templating.cjs");
+const { loadPages, METHODS } = require('./pages.js');
+const { loadBackendMethods } = require("./be-methods.js");  
+const { requestListener } = require('./req-handler.js');
+const { Component } = require("./templating.js");
 
 const HOST = 'localhost';
 const PORT = 8000;

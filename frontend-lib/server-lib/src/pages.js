@@ -1,9 +1,9 @@
 // MAP PAGES TO HTML FILES
 
-const fs = require("fs");
+const fs = require('fs');
 const path = require('path');
-const exec = require('child_process').exec;
 const mime = require('mime');
+const { exec } = require('child_process');
 
 const METHODS = {
     GET: {},
@@ -13,13 +13,16 @@ const METHODS = {
     PATCH: {}
 };
 
-const PLAYGROUND_FOLDER = '..\\..\\';
 const DIST_FOLDER = 'dist\\';
 const SRC_FOLDER = 'src\\frontend\\pages\\';
 
-const PRINT_ERR = false;
+const PRINT_ERR = true;
 
-const loadPages = (dir = PLAYGROUND_FOLDER + SRC_FOLDER) => {
+const loadPages = (dir = SRC_FOLDER) => {
+    if (!fs.existsSync(DIST_FOLDER)) {
+        fs.mkdirSync(DIST_FOLDER)
+    }
+
     fs.readdirSync(dir).forEach(fname => {
         const rpath = path.join(dir, fname);
         if (fs.statSync(rpath).isDirectory()) {
@@ -54,41 +57,41 @@ const addPage = (route, content, mime) => {
 };
 
 const loadOtherFile = (path) => {
-    const origin = path.replace(PLAYGROUND_FOLDER + SRC_FOLDER, "");
+    const origin = path.replace(SRC_FOLDER, "");
     const target = origin;
 
     console.log("copy:\t", SRC_FOLDER + origin, "\t=>", DIST_FOLDER + target);
-    exec(
-        `cd ${PLAYGROUND_FOLDER} && copy ${SRC_FOLDER + origin} ${DIST_FOLDER + target}`,
-        (err, stdout, stderr) => { if (PRINT_ERR) console.log({err, stdout, stderr}); }
+    fs.copyFileSync(
+        SRC_FOLDER + origin,
+        DIST_FOLDER + target
     );
 
-    const content = fs.readFileSync(PLAYGROUND_FOLDER + SRC_FOLDER + target).toString();
+    const content = fs.readFileSync(SRC_FOLDER + target).toString();
     addPage(target, content, mime.getType(target));
 };
 
 const loadClientJS = (path) => {
-    const origin = path.replace(PLAYGROUND_FOLDER + SRC_FOLDER, "");
+    const origin = path.replace(SRC_FOLDER, "");
     const target = origin.replace("client.mjs", "bundle.js");
 
     console.log("rollup:\t", SRC_FOLDER + origin, "\t=>", DIST_FOLDER + target);
     exec(
-        `cd ${PLAYGROUND_FOLDER} && rollup -f es -i ${SRC_FOLDER + origin} -o ${DIST_FOLDER + target}`,
-        () => {} // (err, stdout, stderr) => { console.log({err, stdout, stderr}) }
+        `rollup -c -f es -i ${SRC_FOLDER + origin} -o ${DIST_FOLDER + target}`,
+        (err, _, stderr) => { if (PRINT_ERR && !!err) console.error(stderr); }
     );
 
-    const content = fs.readFileSync(PLAYGROUND_FOLDER + DIST_FOLDER + target).toString();
+    const content = fs.readFileSync(DIST_FOLDER + target).toString();
     addPage(target, content, mime.getType(target));
 };
 
-const loadServerHTML = (path) => {
-    const origin = path.replace(PLAYGROUND_FOLDER + SRC_FOLDER, "");
+const loadServerHTML = (p) => {
+    const origin = p.replace(SRC_FOLDER, "");
     const target = origin.replace("server.cjs", "index.html");
-    
-    console.log("ssg:\t", SRC_FOLDER + origin, "\t=>", DIST_FOLDER + target);      
-    const IndexComponent = require('..\\' + path);
+
+    console.log("ssg:\t", SRC_FOLDER + origin, "\t=>", DIST_FOLDER + target);
+    const IndexComponent = require(path.resolve(p));
     const content = new IndexComponent()._render();
-    fs.writeFileSync(PLAYGROUND_FOLDER + DIST_FOLDER + target, content, console.log);
+    fs.writeFileSync(DIST_FOLDER + target, content, console.log);
     
     const route  = origin.replace("client.mjs", "");
     addPage(route, content, mime.getType(target));

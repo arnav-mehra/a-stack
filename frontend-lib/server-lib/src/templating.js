@@ -42,15 +42,11 @@ class Component {
         <meta charset="UTF-8">
         <title>${this.title}</title>
         ${this.styleSheetImports()}
-        <script src="bundle.js" type="module"></script>
+        <script src="bundle.js" type="module" defer></script>
     </head>
     <body id="main">
         ${body}
     </body>
-    <script>
-        import { hydrate } from "bundle.js";
-        hydrate();
-    </script>
 </html>`
         );
     }
