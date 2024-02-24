@@ -9,7 +9,7 @@ import { Component } from 'a-stack-client';
                         render() {
                             return (
                                 this.Element("div", {
-                        
+                        "id": "title"
                     }, [
                         this.Text("hello world")
                     ])

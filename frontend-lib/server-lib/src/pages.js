@@ -19,8 +19,9 @@ const SRC_FOLDER = 'src\\frontend\\pages-build\\';
 const PRINT_ERR = true;
 
 const loadPages = (dir = SRC_FOLDER) => {
-    if (!fs.existsSync(DIST_FOLDER)) {
-        fs.mkdirSync(DIST_FOLDER)
+    const ddir = dir.replace(SRC_FOLDER, DIST_FOLDER);
+    if (!fs.existsSync(ddir)) {
+        fs.mkdirSync(ddir);
     }
 
     fs.readdirSync(dir).forEach(fname => {

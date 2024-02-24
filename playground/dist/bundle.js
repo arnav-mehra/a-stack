@@ -279,7 +279,7 @@ class Hello extends Component {
                         render() {
                             return (
                                 this.Element("div", {
-                        
+                        "id": "title"
                     }, [
                         this.Text("hello world")
                     ])
