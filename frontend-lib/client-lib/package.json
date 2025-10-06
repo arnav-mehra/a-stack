@@ -1,9 +1,8 @@
 {
+    "name": "a-stack-client",
     "type": "module",
-    "scripts": {
-        "build": "tsc && rollup -c"
-    },
-    "devDependencies": {
-        "@rollup/plugin-strip": "^3.0.2"
+    "main": "dist/bundle.js",
+    "author": {
+        "name": "arnav"
     }
 }

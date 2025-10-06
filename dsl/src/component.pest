@@ -1,25 +1,36 @@
 WHITESPACE = _{ " " | NEWLINE }
 
-NO_QUOTE_BC = @{ " " | "!" | ('#'..'&') | ('('..'Z') | "\\" | "^" | "_" | ('a'..'z') | "|" | "~" | NEWLINE }
-NO_QUOTE    = @{ NO_QUOTE_BC | "{" | "}" | "[" | "]" }
+NO_QUOTE_BC = @{!("\"" | "[" | "]" | "{" | "}") ~ ASCII}
+NO_QUOTE    = @{!("\"") ~ ASCII}
 
+JS_VAR        = @{ (ASCII_ALPHANUMERIC | "_" | ".")* }
 JS_STRING     = @{ ("\"" ~ NO_QUOTE* ~ "\"") | ("'" ~ NO_QUOTE* ~ "'") | ("`" ~ NO_QUOTE* ~ "`") }
 JS_STRINGLESS = @{ NO_QUOTE_BC* }
-
 JS_BLOCKLESS  = @{ JS_STRINGLESS ~ (JS_STRING ~ JS_STRINGLESS)* }
-JS_BLOCKINNER = @{ JS_BLOCKLESS ~ (JS_BLOCK ~ JS_BLOCKLESS)* }
-JS_BLOCK      = ${ ("{" ~ JS_BLOCKINNER ~ "}") | ("[" ~ JS_BLOCKINNER ~ "]") }
+JS_BLOCKINNER = { JS_BLOCKLESS ~ (BLOCK ~ JS_BLOCKLESS)* }
+JS_BLOCK_B    = { "[" ~ JS_BLOCKINNER ~ "]" }
+JS_BLOCK_C    = { "{" ~ JS_BLOCKINNER ~ "}" }
+JS_BLOCK      = { JS_BLOCK_B | JS_BLOCK_C }
+
+REACTIVE_DEPS = { JS_VAR ~ ("," ~ JS_VAR)* }
+REACTIVE      = { "[R:" ~ "(" ~ REACTIVE_DEPS ~ ")" ~ "=>" ~ JS_BLOCKINNER ~ "]" }
+STATE         = { "[S:" ~ JS_BLOCKINNER ~ "]" }
+
+BLOCK = { STATE | REACTIVE | JS_BLOCK }
 
 PROP    = @{ ASCII_ALPHA ~ ASCII_ALPHANUMERIC* }
 PROP_EL = { "props" ~ "[" ~ PROP* ~ "]" }
 
-TEXT_EL   = ${ JS_STRING | JS_BLOCK }
-SCRIPT_EL = { "script" ~ WHITESPACE* ~ JS_BLOCK }
+TEXT_EL   = ${ JS_STRING | BLOCK }
+SCRIPT_EL = { "script" ~ WHITESPACE* ~ BLOCK }
 
-TAG        = @{ ASCII_ALPHA_LOWER+ }
+IMPORT_EL = { "imports" ~ WHITESPACE* ~ BLOCK }
+EXPORT_EL = { "exports" ~ WHITESPACE* ~ BLOCK }
+
+TAG        = @{ (ASCII_ALPHA_LOWER | ":" | ".")+ }
 ATTR_KEY   = @{ (ASCII_ALPHANUMERIC | "-")* }
-ATTR_VALUE = ${ JS_STRING | JS_BLOCK }
+ATTR_VALUE = { JS_STRING | BLOCK }
 ATTR       = { ATTR_KEY ~ "=" ~ ATTR_VALUE }
 HTML_EL    = { TAG ~ ATTR* ~ ("[" ~ (HTML_EL | TEXT_EL)* ~ "]")* }
 
-COMPONENT = { PROP_EL ~ SCRIPT_EL ~ HTML_EL }
+COMPONENT = { EXPORT_EL | (IMPORT_EL? ~ PROP_EL? ~ SCRIPT_EL? ~ HTML_EL) }

@@ -1,0 +1,22 @@
+{
+  "name": "a-stack-example",
+  "version": "1.0.0",
+  "description": "an example app in a-stack",
+  "scripts": {
+    "rebuild-dist": "node src/backend/main.cjs",
+    "rebuild-pages": "cargo run --manifest-path ../dsl/Cargo.toml -- src/frontend/pages src/frontend/pages-build",
+
+    "dev-dist": "nodemon --ext \"cjs,mjs\" --watch src --exec \"npm run rebuild-dist\"",
+    "dev-pages": "nodemon --ext \"jss,jsc\" --watch src/frontend/pages --exec \"npm run rebuild-pages && npm run rebuild-dist\""
+  },
+  "author": {
+    "name": "arnav"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "a-stack-client": "file:../frontend-lib/client-lib",
+    "a-stack-server": "file:../frontend-lib/server-lib",
+    "rollup": "^4.9.6"
+  }
+}

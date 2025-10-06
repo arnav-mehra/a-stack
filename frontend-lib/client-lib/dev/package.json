@@ -1,0 +1,16 @@
+{
+    "type": "module",
+    "author": {
+        "name": "arnav"
+    },
+    "scripts": {
+        "build": "tsc && rollup -c"
+    },
+    "devDependencies": {
+        "@rollup/plugin-strip": "^3.0.2"
+    },
+    "dependencies": {
+        "rollup": "^4.9.6",
+        "typescript": "^5.3.3"
+    }
+}

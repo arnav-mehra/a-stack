@@ -1,0 +1,36 @@
+imports [
+]
+
+script [
+    this.x = [S: 10];
+    this.v = [R: (this.x) => x];
+]
+
+div
+    onclick={this.bind.ez}
+    class="flex"
+[
+    div [
+        {this.hi}
+    ]
+
+    div:map
+        arr={[R: (this.d) => d.arr]}
+        ctx={i => {
+            const textReactive = [R: (this.d) => d.arr[i]];
+        }}
+    [
+        div [
+            {textReactive}
+        ]
+    ]
+
+    div:this.hi
+    []
+
+    div:cond
+        if={[R: (this.d) => d.value == 5]}
+    [
+        "true"
+    ]
+]

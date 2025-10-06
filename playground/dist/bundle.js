@@ -271,4 +271,22 @@ Component.prototype.Conditional = function (wrapper, reactive, trueRenderFunc) {
     return this.Component(ConditionalComponent, wrapper, this, reactive, trueRenderFunc);
 };
 
-export { Component, hydrate };
+class Hello extends Component {
+                        constructor(props) {
+                            super(props);
+                            
+                        }
+                        render() {
+                            return (
+                                this.Element("div", {
+                        "id": "title"
+                    }, [
+                        this.Text("hello world")
+                    ])
+                            )
+                        }
+                    }
+
+hydrate();
+
+export { Hello };
